@@ -12,6 +12,17 @@ Fig. 1: Overview of the LPSGM framework for sleep staging and disorder diagnosis
 
 Fig. 5: Overall architecture of LPSGM. (a) LPSGM consists of an Epoch Encoder, Sequence Encoder, and Classifier, designed for both sleep staging and disorder diagnosis. (b) The Epoch Encoder employs a dual-branch CNN to extract local intra-epoch features from each 30-second PSG segment, using small and large convolutional filters to capture high- and low-frequency EEG features, respectively. (c) The Sequence Encoder consists of a series of N Transformer blocks to capture temporal dependencies across epochs in the sleep sequence. Each Transformer block consists of multi-head self-attention (MSA), feed-forward networks (FFN), and layer normalization (LN). (d) Padding and masking strategy implemented to handle samples with varying numbers of EEG channels, ensuring compatibility across different PSG datasets.
 
-## Code Availability
+## Citation
 
-The complete code will be released upon acceptance of the paper.
+If you use the code or results in your research, please consider citing our work at:
+
+```
+@article{deng2024lpsgm,
+  title={A unified flexible large psg model for sleep staging and mental disorder diagnosis},
+  author={Deng, Guifeng and others},
+  journal={medRxiv},
+  year={2024},
+  doi={10.1101/2024.12.11.24318815},
+  url={https://www.medrxiv.org/content/10.1101/2024.12.11.24318815v2},
+}
+```
