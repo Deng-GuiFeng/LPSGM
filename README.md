@@ -23,6 +23,6 @@ If you use the code or results in your research, please consider citing our work
   journal={medRxiv},
   year={2024},
   doi={10.1101/2024.12.11.24318815},
-  url={https://www.medrxiv.org/content/10.1101/2024.12.11.24318815v2},
+  url={https://www.medrxiv.org/content/10.1101/2024.12.11.24318815v3},
 }
 ```
