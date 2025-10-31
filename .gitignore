@@ -1,0 +1,13 @@
+__pycache__/
+.vscode/
+
+.cache/
+data/
+figures/
+weights/
+
+LICENSE.txt
+
+*.edf
+*.npz
+*.npy

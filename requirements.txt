@@ -1,0 +1,31 @@
+# Core dependencies for LPSGM
+# Python 3.10.9 recommended
+
+# Deep Learning Framework
+torch==2.0.0
+# Note: For CUDA support, install with: pip install torch==2.0.0+cu117 -f https://download.pytorch.org/whl/torch_stable.html
+
+# Scientific Computing
+numpy==1.23.5
+scipy==1.15.1
+
+# Data Processing
+pandas==2.2.3
+h5py==3.13.0
+hdf5storage==0.1.19
+
+# Machine Learning
+scikit-learn==1.6.1
+
+# Signal Processing and EEG/PSG Analysis
+mne==1.9.0
+
+# Web Scraping (for dataset preprocessing)
+beautifulsoup4==4.13.3
+
+# Progress Bar
+tqdm==4.67.1
+
+# Web Demo (Optional - only needed for running web_demo/)
+streamlit==1.49.1
+plotly==6.3.0

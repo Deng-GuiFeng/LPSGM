@@ -1,0 +1,12 @@
+[server]
+maxUploadSize = 1000
+maxMessageSize = 1000
+port = 8501
+address = "127.0.0.1"
+headless = true
+enableCORS = false
+enableXsrfProtection = false
+
+[browser]
+serverAddress = "LPSGM.jianglab.space"
+serverPort = 443
