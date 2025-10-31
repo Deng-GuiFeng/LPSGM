@@ -57,7 +57,7 @@ bash finetune.sh
 
 ## Dataset Preparation
 
-To reproduce the complete training process, download the following datasets:
+To reproduce the complete training process, apply for and download the following datasets from their respective sources:
 
 ### Sleep Staging Datasets
 
