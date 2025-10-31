@@ -3,7 +3,6 @@ __pycache__/
 
 .cache/
 data/
-figures/
 weights/
 
 LICENSE.txt
