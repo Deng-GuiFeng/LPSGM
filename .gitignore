@@ -4,9 +4,12 @@ __pycache__/
 .cache/
 data/
 weights/
+run/
+run_nar/
 
 LICENSE.txt
 
 *.edf
 *.npz
 *.npy
+.log

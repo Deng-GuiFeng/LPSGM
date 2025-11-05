@@ -169,7 +169,7 @@ if 'hypnogram' not in st.session_state:
 if 'selected_channel_tag' not in st.session_state:
     st.session_state.selected_channel_tag = None
 if 'timescale_s_page' not in st.session_state:
-    st.session_state.timescale_s_page = 300 # Default 300 seconds per page for signal display
+    st.session_state.timescale_s_page = 600 # Default 600 seconds per page for signal display
 if 'current_time_offset_s' not in st.session_state:
     st.session_state.current_time_offset_s = 0.0 # Current time offset in seconds (float)
 
@@ -177,7 +177,7 @@ if 'current_time_offset_s' not in st.session_state:
 SUPPORTED_CHANNELS = ["F3", "F4", "C3", "C4", "O1", "O2", "E1", "E2", "Chin"]
 EPOCH_DURATION_S = 30  # Duration of one epoch in seconds
 RESAMPLE_RATE = 100    # Signal resampling rate in Hz
-EXAMPLE_EDF_PATH = "example.edf"  # Path to example EDF file
+EXAMPLE_EDF_PATH = "web_demo/example.edf"  # Path to example EDF file
 TEMP_UPLOAD_PATH = "temp_uploaded.edf"  # Temporary path for uploaded EDF files
 
 

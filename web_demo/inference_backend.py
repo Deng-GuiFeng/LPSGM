@@ -53,14 +53,14 @@ class args:
     ch_emb_dim = 32                   # Channel embedding dimension
     seq_emb_dim = 64                  # Sequence embedding dimension
     seq_len = 20                     # Length of input sequence (number of epochs)
-    num_transformer_blocks = 4       # Number of transformer blocks in sequence encoder
+    num_transformer_blocks = 6       # Number of transformer blocks in sequence encoder
     transformer_num_heads = 8        # Number of attention heads in transformer
     transformer_dropout = 0           # Dropout rate for transformer layers
     transformer_attn_dropout = 0      # Attention dropout rate
     epoch_encoder_dropout = 0         # Dropout rate in epoch encoder
     batch_size = 64                  # Batch size for inference
     clamp_value = 10                 # Clamp value for model inputs (if applicable)
-    weights = r"weights/ched32_seqed64_ch9_seql20_block4.pth"  # Path to pretrained model weights
+    weights = r"weights/ched32_seqed64_ch9_seql20_block6.pth"  # Path to pretrained model weights
 
 
 def sequence_voting(logits, N, seq_len):

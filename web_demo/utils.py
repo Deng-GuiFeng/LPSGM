@@ -209,12 +209,16 @@ def calculate_hypnogram_metrics(hypnogram: np.ndarray, verbose=False):
     Returns:
         dict: Dictionary containing sleep metrics including latencies, durations, episode counts, and stage percentages.
     """
+
+    if not isinstance(hypnogram, np.ndarray):
+        hypnogram = np.array(hypnogram)
+
     # Duration of each epoch/frame in minutes (30 seconds = 0.5 minutes)
     time_per_frame = 0.5
 
     # Find index of first non-Wake epoch (start of sleep)
     try:
-        first_non_w_index = np.where(hypnogram != 0)[0][0]
+        first_non_w_index = np.where(hypnogram != 'W')[0][0]
     except IndexError:
         raise ValueError("Hypnogram contains no non-Wake stages; cannot compute sleep latency.")
 
@@ -242,20 +246,20 @@ def calculate_hypnogram_metrics(hypnogram: np.ndarray, verbose=False):
     rem_latency = calculate_latency_after_n1(4, first_non_w_index)  # REM latency
 
     # Calculate total sleep time (TST) and durations of each stage in minutes
-    tst = np.sum(hypnogram > 0) * time_per_frame  # Total sleep time excluding Wake
-    rem_duration = np.sum(hypnogram == 4) * time_per_frame  # REM sleep duration
-    nrem_duration = np.sum((hypnogram == 1) | (hypnogram == 2) | (hypnogram == 3)) * time_per_frame  # NREM duration
-    sws_duration = np.sum(hypnogram == 3) * time_per_frame  # Slow wave sleep (N3) duration
+    tst = np.sum(hypnogram != 'W') * time_per_frame  # Total sleep time excluding Wake
+    rem_duration = np.sum(hypnogram == 'R') * time_per_frame  # REM sleep duration
+    nrem_duration = np.sum((hypnogram == 'N1') | (hypnogram == 'N2') | (hypnogram == 'N3')) * time_per_frame  # NREM duration
+    sws_duration = np.sum(hypnogram == 'N3') * time_per_frame  # Slow wave sleep (N3) duration
 
     # Calculate wake duration and number of wake episodes after sleep onset
     wake_after_sleep = hypnogram[first_non_w_index:]
-    wake_duration = np.sum(wake_after_sleep == 0) * time_per_frame  # Wake time after sleep onset
+    wake_duration = np.sum(wake_after_sleep == 'W') * time_per_frame  # Wake time after sleep onset
     # Count transitions into Wake stage (episodes) after sleep onset
-    wake_episodes = np.sum((wake_after_sleep[:-1] != 0) & (wake_after_sleep[1:] == 0))
+    wake_episodes = np.sum((wake_after_sleep[:-1] != 'W') & (wake_after_sleep[1:] == 'W'))
 
     # Calculate durations of individual sleep stages
-    n1_duration = np.sum(hypnogram == 1) * time_per_frame
-    n2_duration = np.sum(hypnogram == 2) * time_per_frame
+    n1_duration = np.sum(hypnogram == 'N1') * time_per_frame
+    n2_duration = np.sum(hypnogram == 'N2') * time_per_frame
     n3_duration = sws_duration  # N3 duration equals slow wave sleep duration
 
     # Calculate percentage of total sleep time for each stage

@@ -2,8 +2,8 @@
 
 # Prepare Sleep Staging Datasets
 
-# python ./preprocess/HANG7.py   # private dataset
-# python ./preprocess/SYSU.py    # private dataset
+python ./preprocess/HANG7.py   # private dataset
+python ./preprocess/SYSU.py    # private dataset
 python ./preprocess/DOD-H.py
 python ./preprocess/DOD-O.py
 python ./preprocess/APPLES.py
