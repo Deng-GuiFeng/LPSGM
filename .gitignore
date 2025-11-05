@@ -12,4 +12,4 @@ LICENSE.txt
 *.edf
 *.npz
 *.npy
-.log
+*.log
