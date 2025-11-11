@@ -7,6 +7,5 @@ headless = true
 enableCORS = false
 enableXsrfProtection = false
 
-[browser]
-serverAddress = "LPSGM.jianglab.space"
-serverPort = 443
+[theme]
+base = "light"

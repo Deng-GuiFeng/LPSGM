@@ -771,14 +771,27 @@ def main():
         st.markdown('<div class="section-header"><h3>⚙️ Channel Selection and Mapping</h3></div>', unsafe_allow_html=True)
         
         st.info("""
-        **Instructions for Channel Mapping:**
-        - **EEG Channels (F3, F4, C3, C4, O1, O2)**: Map to electroencephalogram electrodes for brain activity recording
-        - **EOG Channels (E1, E2)**: Map to electrooculogram electrodes for eye movement recording  
-        - **EMG Channel (Chin)**: Map to electromyogram electrode for muscle activity recording
-        - **Single Channel**: Direct mapping to one electrode (e.g., F3-M2)
-        - **Differential Channel**: Calculate difference between two electrodes (e.g., F3 minus M2)
+        **How to Configure Channel Mapping:**
         
-        Select at least 2-3 channels for optimal sleep staging performance. The system supports flexible channel configurations from 1 to 9 channels.
+        LPSGM uses 9 standard channels for sleep staging and supports flexible configurations (1-9 channels).
+        The system automatically handles missing channels, so you only need to map the channels available in your EDF file.
+        
+        **Standard Channels:**
+        - **EEG (brain activity)**: F3, F4, C3, C4, O1, O2
+        - **EOG (eye movement)**: E1, E2  
+        - **EMG (muscle activity)**: Chin
+        
+        **Mapping Instructions:**
+        1. Click a channel button below (e.g., C3, E1) to configure it
+        2. Choose the mapping type based on your EDF file format:
+           - **Single Channel**: Your EDF has pre-referenced channels like 'C3-M2' or 'EOG-L' → Select the channel name directly
+           - **Differential Channel**: Your EDF has separate electrodes like 'C3' and 'M2' → Select both electrodes to compute their difference (C3 minus M2)
+        3. Repeat for each available channel in your EDF file
+        4. Channels not mapped will be treated as missing (the model handles this automatically)
+        
+        **Recommended**: Map at least C3, C4, E1, E2 for optimal sleep staging performance. More channels generally improve accuracy.
+        
+        **For the Example File**: Use single channel mapping for F3→'EEG F3-LER', F4→'EEG F4-LER', C3→'EEG C3-LER', C4→'EEG C4-LER', O1→'EEG O1-LER', O2→'EEG O2-LER', E1→'EOG Left Horiz', E2→'EOG Right Horiz', and differential mapping for Chin→('EMG Chin1', 'EMG Chin2').
         """)
         
         # Display channel tag buttons for mapping selection

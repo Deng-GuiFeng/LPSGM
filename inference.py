@@ -67,8 +67,85 @@ if __name__ == "__main__":
     shutil.rmtree(hypnogram_dir, ignore_errors=True)
     os.makedirs(hypnogram_dir, exist_ok=True)
 
-    # Define channel mapping for loading signals from EDF files
-    # Keys are target channel names; values are tuples of possible EDF channel names
+    # ==================================================================================
+    # CHANNEL MAPPING CONFIGURATION - IMPORTANT FOR INFERENCE
+    # ==================================================================================
+    # 
+    # LPSGM supports flexible channel configurations with 9 standard channels:
+    #   EEG: F3, F4, C3, C4, O1, O2
+    #   EOG: E1, E2
+    #   EMG: Chin
+    # 
+    # The model can handle missing channels through a padding and masking mechanism,
+    # allowing inference with 1 to 9 channels. However, using more channels (especially
+    # C3, C4, E1, E2) generally improves sleep staging performance.
+    # 
+    # HOW TO CONFIGURE channel_map_for_load_sig:
+    # -------------------------------------------
+    # This dictionary maps LPSGM's standard channel names (keys) to your EDF channel
+    # names (values). Each value is a tuple of options tried in order of priority.
+    # 
+    # Two types of channel mapping are supported:
+    # 
+    # 1. SINGLE CHANNEL MAPPING:
+    #    If your EDF already contains pre-referenced channels (e.g., 'F3-M2', 'C3-A2'),
+    #    map directly to the channel name as a string:
+    #    
+    #    'F3': ('F3-M2', 'F3-A2', 'EEG F3-M2'),  # Try 'F3-M2' first, then 'F3-A2', etc.
+    #    'C3': ('C3-M2',),                        # Only one option
+    # 
+    # 2. DIFFERENTIAL CHANNEL MAPPING:
+    #    If your EDF contains individual electrodes (e.g., 'F3', 'M2'), use a tuple
+    #    of two channel names to compute the difference (first minus second):
+    #    
+    #    'F3': (('F3', 'M2'), ('F3', 'A2')),     # Try F3-M2 first, then F3-A2
+    #    'C3': (('C3', 'M2'),),                   # Compute C3-M2 as differential
+    # 
+    # 3. MIXED MAPPING (RECOMMENDED):
+    #    You can mix both types to handle different EDF formats:
+    #    
+    #    'F3': ('F3-M2', ('F3', 'M2'), 'EEG F3'),  # Try single channel first, then differential
+    # 
+    # STEPS TO CONFIGURE FOR YOUR EDF FILES:
+    # --------------------------------------
+    # 1. Check your EDF channel names using: get_ch_names(your_edf_path)
+    # 2. Identify which channels correspond to F3, F4, C3, C4, O1, O2, E1, E2, Chin
+    # 3. For each LPSGM channel you want to use:
+    #    - If the EDF has a pre-referenced channel (e.g., 'C3-M2'), use single mapping
+    #    - If the EDF has separate electrodes (e.g., 'C3' and 'M2'), use differential mapping
+    # 4. Comment out channels not available in your EDF (model handles missing channels)
+    # 5. Provide multiple options for each channel if your EDF naming varies
+    # 
+    # EXAMPLE CONFIGURATIONS:
+    # -----------------------
+    # Example 1: EDF with pre-referenced channels
+    # channel_map_for_load_sig = {
+    #     'C3': ('C3-M2', 'C3-A2'),
+    #     'C4': ('C4-M1', 'C4-A1'),
+    #     'E1': ('E1-M2', 'LOC-M2'),
+    #     'E2': ('E2-M1', 'ROC-M1'),
+    # }
+    # 
+    # Example 2: EDF with individual electrodes (differential)
+    # channel_map_for_load_sig = {
+    #     'C3': (('C3', 'M2'), ('C3', 'A2')),
+    #     'C4': (('C4', 'M1'), ('C4', 'A1')),
+    #     'E1': (('E1', 'M2'),),
+    #     'E2': (('E2', 'M1'),),
+    # }
+    # 
+    # Example 3: Mixed mapping (handles multiple EDF formats)
+    # channel_map_for_load_sig = {
+    #     'C3': ('C3-M2', ('C3', 'M2'), 'EEG C3-M2'),
+    #     'C4': ('C4-M1', ('C4', 'M1'), 'EEG C4-M1'),
+    #     'E1': ('E1-M2', ('E1', 'M2'), 'EOG-L'),
+    #     'E2': ('E2-M1', ('E2', 'M1'), 'EOG-R'),
+    # }
+    # 
+    # NOTE: The load_sig() function (in web_demo/utils.py) processes this mapping.
+    # It tries each option in order until a match is found in the EDF file.
+    # ==================================================================================
+    
     channel_map_for_load_sig = {
         # 'F3': ('F3', ),
         # 'F4': ('F4', ),

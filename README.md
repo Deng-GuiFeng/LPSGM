@@ -33,6 +33,8 @@ Then modify the following parameters in `inference.py`:
 - `hypnogram_dir`: output path for hypnograms
 - `channel_map_for_load_sig`: channel mapping based on your EDF channel names
 
+**Important - Channel Mapping Configuration**: LPSGM uses 9 standard channels (F3, F4, C3, C4, O1, O2, E1, E2, Chin) and supports flexible configurations with 1-9 channels through a padding and masking mechanism. The `channel_map_for_load_sig` parameter maps these standard channel names to your EDF channel names. Two mapping types are supported: (1) **single channel mapping** for pre-referenced channels (e.g., `'C3': ('C3-M2',)`), and (2) **differential channel mapping** for computing differences between two electrodes (e.g., `'C3': (('C3', 'M2'),)`). Detailed configuration instructions with examples are provided in the comments above `channel_map_for_load_sig` in `inference.py`. Please read these instructions carefully to ensure correct channel mapping for your EDF files.
+
 Run inference with:
 
 ```bash
