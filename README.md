@@ -26,7 +26,7 @@ pip install -r requirements.txt
 
 ## Inference
 
-If you only want to run inference on your own dataset without training, download our pre-trained weights from [Google Drive](https://drive.google.com/file/d/1Gg8mc2AC2Pt_sa4POp9kMZO92nW5XuLu/view?usp=sharing) and place them in the `weights/` directory.
+If you only want to run inference on your own dataset without training, download our pre-trained weights from [Google Drive](https://drive.google.com/drive/folders/1eMuRaK4PelUAh9uG9DR2HXgExNmsoWhx?usp=sharing) and place them in the `weights/` directory.
 
 Then modify the following parameters in `inference.py`:
 - `edf_dir`: path to your EDF files
