@@ -6,6 +6,7 @@ data/
 weights/
 run/
 run_nar/
+gradcam/
 
 LICENSE.txt
 

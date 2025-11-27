@@ -3,9 +3,8 @@
 inference_backend.py
 
 This module provides the backend functionality for performing inference using the LPSGM (Large Polysomnography Model) 
-for sleep staging and mental disorder diagnosis. It includes model loading, data preprocessing, batch inference, 
-and post-processing of predictions into hypnograms. The module supports multi-GPU setups and optional subprocess 
-execution to manage CUDA contexts efficiently.
+for sleep staging. It includes model loading, data preprocessing, batch inference, and post-processing of predictions 
+into hypnograms. The module supports multi-GPU setups and optional subprocess execution to manage CUDA contexts efficiently.
 
 Key functionalities:
 - Mapping EEG/EOG/EMG channel names to model spatial embedding indices.

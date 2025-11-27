@@ -227,7 +227,7 @@ def calculate_hypnogram_metrics(hypnogram: np.ndarray, verbose=False):
         Calculate latency (in minutes) to a specified sleep stage after the first non-Wake epoch.
 
         Args:
-            stage (int): Sleep stage label to find latency for.
+            stage (str): Sleep stage label to find latency for.
             first_n1_index (int): Index of first non-Wake epoch.
 
         Returns:
@@ -240,10 +240,10 @@ def calculate_hypnogram_metrics(hypnogram: np.ndarray, verbose=False):
             return np.nan  # Stage not present in hypnogram
 
     # Calculate latencies to each sleep stage after sleep onset
-    n1_latency = calculate_latency_after_n1(1, first_non_w_index)  # N1 latency
-    n2_latency = calculate_latency_after_n1(2, first_non_w_index)  # N2 latency
-    n3_latency = calculate_latency_after_n1(3, first_non_w_index)  # N3 latency
-    rem_latency = calculate_latency_after_n1(4, first_non_w_index)  # REM latency
+    n1_latency = calculate_latency_after_n1('N1', first_non_w_index)  # N1 latency
+    n2_latency = calculate_latency_after_n1('N2', first_non_w_index)  # N2 latency
+    n3_latency = calculate_latency_after_n1('N3', first_non_w_index)  # N3 latency
+    rem_latency = calculate_latency_after_n1('R', first_non_w_index)  # REM latency
 
     # Calculate total sleep time (TST) and durations of each stage in minutes
     tst = np.sum(hypnogram != 'W') * time_per_frame  # Total sleep time excluding Wake
