@@ -178,7 +178,7 @@ SUPPORTED_CHANNELS = ["F3", "F4", "C3", "C4", "O1", "O2", "E1", "E2", "Chin"]
 EPOCH_DURATION_S = 30  # Duration of one epoch in seconds
 RESAMPLE_RATE = 100    # Signal resampling rate in Hz
 EXAMPLE_EDF_PATH = "web_demo/example.edf"  # Path to example EDF file
-TEMP_UPLOAD_PATH = "temp_uploaded.edf"  # Temporary path for uploaded EDF files
+TEMP_UPLOAD_PATH = "web_demo/temp_uploaded.edf"  # Temporary path for uploaded EDF files
 
 
 def inference(sig_dict, debug=False):

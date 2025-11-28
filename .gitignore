@@ -8,7 +8,6 @@ run/
 run_nar/
 gradcam/
 
-LICENSE.txt
 
 *.edf
 *.npz

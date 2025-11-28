@@ -130,11 +130,11 @@ If you use this code or results in your research, please cite:
 
 ```bibtex
 @article{deng2024lpsgm,
-  title={A unified flexible large psg model for sleep staging and mental disorder diagnosis},
+  title={A unified flexible large psg model for sleep staging and Brain disorder diagnosis},
   author={Deng, Guifeng and Niu, Mengfan and Rao, Shuying and Luo, Yuxi and Zhang, Jianjia and Xie, Junyi and Yu, Zhenghe and Liu, Wenjuan and Zhang, Junhang and Zhao, Sha and Pan, Gang and Li, Xiaojing and Deng, Wei and Guo, Wanjun and Zhang, Yaoyun and Li, Tao and Jiang, Haiteng},
   journal={medRxiv},
   year={2024},
   doi={10.1101/2024.12.11.24318815},
-  url={https://www.medrxiv.org/content/10.1101/2024.12.11.24318815v3}
+  url={https://www.medrxiv.org/content/early/2025/11/27/2024.12.11.24318815}
 }
 ```
