@@ -10,7 +10,7 @@ for sleep staging and mental disorder diagnosis.
 """
 
 from web_demo.inference_backend import inference_recodings
-from web_demo.utils import load_sig, pre_process, get_ch_names, calculate_hypnogram_metrics
+from web_demo.utils import find_files_with_suffix, load_sig, pre_process, get_ch_names, calculate_hypnogram_metrics
 
 from tqdm import tqdm
 import os, shutil
@@ -59,9 +59,9 @@ def inference_edf(edf_file_path):
 
 if __name__ == "__main__":
     # Directory containing raw EDF files for inference
-    edf_dir = r"/nvme1/denggf/PSG_datasets/public_datasets/mnc/is-rc/"
+    edf_dir = r"/nvme1/denggf/PSG_datasets/private_datasets/iFocus/DoubleChannel_V2/"
     # Directory to save predicted hypnogram text files
-    hypnogram_dir = r"/nvme1/denggf/PSG_datasets/public_datasets/mnc/IS-RC-hypnogram_LPSGM/"
+    hypnogram_dir = r"/nvme1/denggf/PSG_datasets/private_datasets/iFocus/DoubleChannel_V2_hypnograms/"
 
     # Clear existing hypnogram output directory and recreate it
     shutil.rmtree(hypnogram_dir, ignore_errors=True)
@@ -147,27 +147,27 @@ if __name__ == "__main__":
     # ==================================================================================
     
     channel_map_for_load_sig = {
-        # 'F3': ('F3', ),
-        # 'F4': ('F4', ),
-        'C3': ('C3', ),
-        'C4': ('C4', ),
-        'O1': ('O1', ),
-        'O2': ('O2', ),
-        'E1': ('E1', ),
-        'E2': ('E2', ),
-        'Chin': ('cchin_l', ),  # Chin EMG channel
+        'F3': ('F3', ),
+        'F4': ('F4', ),
+        # 'C3': ('C3', ),
+        # 'C4': ('C4', ),
+        # 'O1': ('O1', ),
+        # 'O2': ('O2', ),
+        # 'E1': ('E1', ),
+        # 'E2': ('E2', ),
+        # 'Chin': ('cchin_l', ),  # Chin EMG channel
     }
     RESAMPLE_RATE = 100  # Target sampling rate in Hz for preprocessing
 
+    edf_file_paths = find_files_with_suffix(edf_dir, suffix='.edf')
     # Iterate over all EDF files in the input directory with progress bar
-    for edf_file in tqdm(os.listdir(edf_dir), desc="Processing EDF files"):
-        if not edf_file.endswith('.edf'):
+    for edf_file_path in tqdm(edf_file_paths, desc="Processing EDF files"):
+    # for edf_file in tqdm(os.listdir(edf_dir), desc="Processing EDF files"):
+        if not edf_file_path.endswith('.edf'):
             continue  # Skip non-EDF files
 
         # Extract subject ID from filename (assumes format: ID-...)
-        sub_id = edf_file.split('-')[0].upper()
-
-        edf_file_path = os.path.join(edf_dir, edf_file)
+        sub_id = os.path.basename(edf_file_path).split('.')[0]
         hypnogram_save_path = os.path.join(hypnogram_dir, f"{sub_id}.STA")
 
         # Perform inference to obtain predicted hypnogram
