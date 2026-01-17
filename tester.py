@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-tester_iterative.py
+tester.py
 
 This script provides an iterative testing and evaluation framework for the LPSGM (Large Polysomnography Model) project.
 It supports loading pretrained LPSGM models to perform sleep staging inference on polysomnography (PSG) recordings.
@@ -280,7 +280,7 @@ def Tester(args, model, channels=None, verbose=False):
     ))
     print(f"Avg Time per Subject: {(end_time-start_time)/len(args.test_subjects):.2f} s")
 
-    # -------- JSONL log writing -------- #
+    # -------- JSON log writing -------- #
     # Infer center name from test subjects if not set
     if center_name is None and len(args.test_subjects) > 0:
         center_name = args.test_subjects[0][1]
@@ -301,7 +301,7 @@ def Tester(args, model, channels=None, verbose=False):
             run_root = os.path.dirname(args.save_dir)
     run_root = run_root or os.getcwd()
 
-    log_file = os.path.join(run_root, f"{center_name}_metrics.jsonl")
+    log_file = os.path.join(run_root, f"{center_name}_metrics.json")
 
     overall_record = {
         'acc': float(acc),
@@ -319,6 +319,9 @@ def Tester(args, model, channels=None, verbose=False):
     def _safe(v):
         if isinstance(v, (str, int, float, bool)) or v is None:
             return v
+        # Convert test_subjects list of tuples to list of lists for JSON compatibility
+        if isinstance(v, list) and len(v) > 0 and isinstance(v[0], tuple):
+            return [list(item) for item in v]
         return str(v)
 
     args_snapshot = {k: _safe(v) for k, v in args.__dict__.items() if not k.startswith('__')}
@@ -340,9 +343,17 @@ def Tester(args, model, channels=None, verbose=False):
     }
 
     try:
-        with open(log_file, 'a', encoding='utf-8') as f:
-            f.write(json.dumps(run_record, ensure_ascii=False) + '\n')
-        print(f"[LOG] Results appended to: {log_file}")
+        # Read existing records if file exists, otherwise start with empty list
+        if os.path.exists(log_file):
+            with open(log_file, 'r', encoding='utf-8') as f:
+                records = json.load(f)
+        else:
+            records = []
+        # Append new record and write back with indentation for readability
+        records.append(run_record)
+        with open(log_file, 'w', encoding='utf-8') as f:
+            json.dump(records, f, ensure_ascii=False, indent=2)
+        print(f"[LOG] Results saved to: {log_file}")
     except Exception as e:
         print(f"[LOG][ERROR] Failed to write log: {e}")
 
@@ -417,7 +428,7 @@ if __name__ == "__main__":
         cache_root = r".cache/"
 
         # Prediction saving options
-        save_pred = True
+        save_pred = False
         save_dir = None
     
 
@@ -426,8 +437,8 @@ if __name__ == "__main__":
     center = "HANG7"
     channels = ('F3','F4','C3','C4','O1','O2','E1','E2','Chin')
 
-    run_name = r"run/Aug16_22-58-20" 
-    weights_file = r"run/Aug16_22-58-20/model_dir/eval_best.pth" 
+    run_name = r"run/Oct31_20-25-22" 
+    weights_file = r"run/Oct31_20-25-22/model_dir/eval_best.pth" 
 
     if args.save_dir is None:
         args.save_dir = os.path.join(run_name, center)
@@ -445,8 +456,8 @@ if __name__ == "__main__":
     center = "SYSU"
     channels = ('F3','F4','C3','C4','O1','O2','E1','E2','Chin')
 
-    run_name = r"run/Aug16_22-58-20" 
-    weights_file = r"run/Aug16_22-58-20/model_dir/eval_best.pth" 
+    run_name = r"run/Oct31_20-25-22" 
+    weights_file = r"run/Oct31_20-25-22/model_dir/eval_best.pth" 
 
     if args.save_dir is None:
         args.save_dir = os.path.join(run_name, center)

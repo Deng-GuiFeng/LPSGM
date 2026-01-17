@@ -27,7 +27,7 @@ import warnings
 from utils import *
 from finetune.finetuner import Finetuner
 from dataset.dataset import *
-from tester_iterative import Tester
+from tester import Tester
 
 # Suppress user warnings to reduce console clutter during execution
 warnings.filterwarnings("ignore", category=UserWarning)

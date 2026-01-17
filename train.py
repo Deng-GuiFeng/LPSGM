@@ -26,7 +26,7 @@ import warnings
 from utils import *
 from train.trainer import Trainer
 from dataset.dataset import *
-from tester_iterative import Tester
+from tester import Tester
 
 # Suppress user warnings to reduce console clutter during training/testing
 warnings.filterwarnings("ignore", category=UserWarning)

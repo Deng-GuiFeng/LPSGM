@@ -11,7 +11,7 @@ python train.py \
     --seq_len 20 \
     --ch_emb_dim 32 \
     --seq_emb_dim 64 \
-    --num_transformer_blocks 6 \
+    --num_transformer_blocks 4 \
     --eval_size 0.1 \
     --batch_size 32 \
     --num_workers 32 \
@@ -26,7 +26,7 @@ python train.py \
     --target_domain HANG7,SYSU \
     --cache_root .cache \
     --random_shift_len 0 \
-    --source_domains APPLES,DCSM,DOD-H,DOD-O,HMC,ISRUC,P2018,SHHS-1,SHHS-2,STAGES-BOGN,STAGES-STNF,STAGES-MSTR,STAGES-GSDV,STAGES-GSBB,STAGES-GSLH,STAGES-GSSA,STAGES-GSSW,STAGES-MSMI,STAGES-MSNF,STAGES-MSQW,STAGES-MSTH,STAGES-STLK,ABC,NCHSDB,HOMEPAP,SVUH,CHAT,CCSHS,CFS,MROS  \
+    --source_domains APPLES,DCSM,DOD-H,DOD-O,HMC,ISRUC,P2018,SHHS-1,SHHS-2,STAGES-BOGN,STAGES-STNF,STAGES-MSTR,STAGES-GSDV,STAGES-GSBB,STAGES-GSLH,STAGES-GSSA,STAGES-GSSW,STAGES-MSMI,STAGES-MSNF,STAGES-MSQW,STAGES-MSTH,STAGES-STLK,ABC,NCHSDB,HOMEPAP,SVUH,CHAT,CCSHS,CFS,MROS,MESA,MASS-SS1,MASS-SS3,BOAS,PATS,WSC  \
     --save_epoch \
     --save_pred 
     # --save_dir 
