@@ -169,7 +169,7 @@ if 'hypnogram' not in st.session_state:
 if 'selected_channel_tag' not in st.session_state:
     st.session_state.selected_channel_tag = None
 if 'timescale_s_page' not in st.session_state:
-    st.session_state.timescale_s_page = 600 # Default 600 seconds per page for signal display
+    st.session_state.timescale_s_page = 3600 # Default 3600 seconds per page for signal display
 if 'current_time_offset_s' not in st.session_state:
     st.session_state.current_time_offset_s = 0.0 # Current time offset in seconds (float)
 

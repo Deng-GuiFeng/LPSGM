@@ -95,15 +95,26 @@ def _build_model(device: torch.device):
         torch.nn.Module: The loaded LPSGM model ready for inference.
     """
     model = LPSGM(args)
-    # Wrap model with DataParallel if multiple GPUs are available
-    if device.type == 'cuda' and torch.cuda.device_count() > 1:
-        model = nn.DataParallel(model)
-    model = model.to(device)
+    
     # Load pretrained weights, supporting checkpoint dict format with 'model_state_dict' key
     state = torch.load(args.weights, map_location='cpu')
     if isinstance(state, dict) and 'model_state_dict' in state:
         state = state['model_state_dict']
-    model.load_state_dict(state)
+
+    # Remove 'module.' prefix if present (handling saved DataParallel models loaded on single GPU/CPU)
+    new_state = {}
+    for k, v in state.items():
+        if k.startswith('module.'):
+            new_state[k[7:]] = v
+        else:
+            new_state[k] = v
+            
+    model.load_state_dict(new_state)
+
+    # Wrap model with DataParallel if multiple GPUs are available
+    if device.type == 'cuda' and torch.cuda.device_count() > 1:
+        model = nn.DataParallel(model)
+    model = model.to(device)
     return model
 
 
