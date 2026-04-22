@@ -154,7 +154,7 @@ We provide a fine-tuning pipeline on the APPLES dataset for binary OSA severity 
 bash osa_cls/run_osa.sh
 ```
 
-The script runs a uniform two-stage pipeline: (1) 5-fold stratified cross-validation with 25% of each fold's training set held out for validation (60/20/20 train/val/test split per fold) to fine-tune the pooled LPSGM backbone, and (2) frozen-backbone linear probing, where a single class-weighted logistic regression is fit on the fold's subject-level mean-pooled features and applied directly to the test split. See `osa_cls/README.md` for the per-fold output layout and `cls_core/` for the shared implementation.
+The script runs a uniform two-stage pipeline: (1) 5-fold stratified cross-validation with 25% of each fold's training set held out for validation (60/20/20 train/val/test split per fold) to fine-tune the pooled LPSGM backbone, and (2) frozen-backbone linear probing, where a single class-weighted logistic regression is fit on the fold's subject-level mean-pooled features and applied directly to the test split. Per-fold outputs (checkpoint, test metrics, linear-probing metrics, predictions, TensorBoard logs) are written to `run_osa/fold{N}/`. The shared training and evaluation logic lives in `cls_core/`.
 
 ## Citation
 
