@@ -1,16 +1,16 @@
-# LPSGM: A Unified Flexible Large PSG Model for Sleep Staging and Mental Disorder Diagnosis
+# LPSGM: A Unified Flexible Large Polysomnography Model for Sleep Staging and Screening of Sleep Disorders and Depression
 
 ## Overview
 
 ![overview](figures/graphical_abstract.png)
 
-**Figure 1**: Overview of the LPSGM framework. Panel (a): Data harmonization schematizes the aggregation of 220,500 hours of PSG data from 16 public datasets and 2 independent clinical cohorts, spanning diverse geographic populations and recording protocols. Panel (b): Cross-center generalization outlines the training-evaluation pipeline: LPSGM is pre-trained on multi-center public datasets, validated for cross-domain sleep staging on two unseen private datasets, and fine-tuned for downstream tasks including sleep disorder diagnosis and MDD screening. Panel (c): Analytical validation details the study's three-pronged evaluation: (1) a prospective clinical trial benchmarking LPSGM against expert consensus, (2) interpretability analysis to decode decision-making patterns, and (3) ablation studies quantifying the contribution of key components.
+**Figure 1**: Overview of the LPSGM framework. Panel (a): Data harmonization schematizes the aggregation of 220,500 hours of PSG data from 16 public datasets and 2 independent clinical cohorts, spanning diverse geographic populations and recording protocols. Panel (b): Cross-center generalization outlines the training-evaluation pipeline: LPSGM is pre-trained on multi-center public datasets, validated for cross-domain sleep staging on two unseen private datasets, and fine-tuned for downstream tasks including screening of sleep disorders and depression. Panel (c): Analytical validation details the study's three-pronged evaluation: (1) a prospective clinical trial benchmarking LPSGM against expert consensus, (2) interpretability analysis to decode decision-making patterns, and (3) ablation studies quantifying the contribution of key components.
 
 ## Architecture
 
 ![architecture](figures/model_architecture.png)
 
-**Figure 2**: Overall architecture of LPSGM. (a) LPSGM consists of an Epoch Encoder, Sequence Encoder, and Classifier, designed for both sleep staging and disorder diagnosis. (b) The Epoch Encoder employs a dual-branch CNN to extract local intra-epoch features from each 30-second PSG segment, using small and large convolutional filters to capture high- and low-frequency EEG features, respectively. (c) The Sequence Encoder consists of a series of N Transformer blocks to capture temporal dependencies across epochs in the sleep sequence. Each Transformer block consists of multi-head self-attention (MSA), feed-forward networks (FFN), and layer normalization (LN). (d) Padding and masking strategy implemented to handle samples with varying numbers of EEG channels, ensuring compatibility across different PSG datasets.
+**Figure 2**: Overall architecture of LPSGM. (a) LPSGM consists of an Epoch Encoder, Sequence Encoder, and Classifier, designed for both sleep staging and disorder screening. (b) The Epoch Encoder employs a dual-branch CNN to extract local intra-epoch features from each 30-second PSG segment, using small and large convolutional filters to capture high- and low-frequency EEG features, respectively. (c) The Sequence Encoder consists of a series of N Transformer blocks to capture temporal dependencies across epochs in the sleep sequence. Each Transformer block consists of multi-head self-attention (MSA), feed-forward networks (FFN), and layer normalization (LN). (d) Padding and masking strategy implemented to handle samples with varying numbers of EEG channels, ensuring compatibility across different PSG datasets.
 
 ## Installation
 
@@ -108,19 +108,36 @@ bash train.sh
 
 **Important**: To reduce memory overhead, the training process doesn't load all samples into memory. Instead, samples are cached in the directory specified by `--cache_root` and loaded dynamically during training. Make sure this directory has enough space to cache the segmented training samples (approximately 1TB as used in our paper).
 
-## Narcolepsy Classification
+## Screening for Sleep Disorders and Depression
 
-We provide a fine-tuning pipeline on the MNC dataset for 3-class narcolepsy classification (Non-narcolepsy Control / Type 1 Narcolepsy / Other Hypersomnia). The code lives in the `nar_cls/` directory and is built on top of the shared `cls_core/` module.
+As a downstream application of the pre-trained LPSGM encoder, we provide fine-tuning pipelines for narcolepsy, OSA severity, and depression classification. All three tasks share a unified two-stage protocol: backbone fine-tuning followed by frozen-backbone linear probing with a single class-weighted logistic regression. The shared implementation lives in `cls_core/`; task-specific data adapters and CLIs live in `nar_cls/`, `osa_cls/`, and `dep_cls/`. Per-fold outputs are written under `run_<task>/fold{N}/`.
 
-**Step 1**: Preprocess the MNC dataset by running the MNC-related commands in `preprocess.sh` so that subject-level NPZ files appear under `data/MNC-{CNC,DHC,FHC,IHC,KHC,SSC}/`. Each NPZ carries a `Diagnosis` integer field (0 = Non-narcolepsy Control, 1 = Type 1 Narcolepsy, 2 = Other Hypersomnia) used as the subject-level label. Place the pretrained weights under `weights/`.
+### Narcolepsy (MNC, 3-class)
 
-**Step 2**: Run the full pipeline from the repository root:
+Classes: Non-narcolepsy Control / Type 1 Narcolepsy / Other Hypersomnia. Labels come from the `Diagnosis` field that the preprocessing scripts write into each subject NPZ.
 
 ```bash
+for c in CNC DHC FHC IHC KHC SSC; do python preprocess/MNC/$c.py; done
 bash nar_cls/run_nar.sh
 ```
 
-The script runs the same uniform two-stage pipeline as `osa_cls`: (1) 5-fold stratified cross-validation with 25% of each fold's training set held out for validation (60/20/20 train/val/test split per fold) to fine-tune the pooled LPSGM backbone, and (2) frozen-backbone linear probing with a class-weighted logistic regression applied directly to each fold's test split. Per-fold outputs (checkpoint, test metrics, linear-probing metrics, predictions, TensorBoard logs) are written to `run_nar/fold{N}/`. The shared training and evaluation logic lives in `cls_core/`.
+### OSA Severity (APPLES, binary)
+
+Classes: Severe vs Non-severe OSA (AHI-based). Labels in `preprocess/apples_osa_labels.csv` (included, 1100 subjects).
+
+```bash
+python preprocess/APPLES.py
+bash osa_cls/run_osa.sh
+```
+
+### Depression (APPLES, binary)
+
+Classes: Depressed vs Non-depressed. Labels in `preprocess/apples_dep_labels.csv` (included, 460 subjects; derivation criteria combine the self-reported `depressionmedhxhp` field with HAMD and BDI clinical scale scores).
+
+```bash
+python preprocess/APPLES.py          # skip if already preprocessed
+bash dep_cls/run_dep.sh
+```
 
 ## Grad-CAM Visualization
 
@@ -138,35 +155,7 @@ python -m gradcam.pipeline \
     --stages save_raw,gradcam,guided,render
 ```
 
-The pipeline runs four stages: (1) LPSGM inference with raw signal caching, (2) dual-branch Grad-CAM at the last convolutional layer of each Epoch Encoder branch, (3) Guided Backpropagation, and (4) per-epoch PNG visualizations fusing Grad-CAM with guided saliency. See `gradcam/README.md` for the aggregation formula and per-file walkthrough.
-
-## OSA Severity Classification
-
-We provide a fine-tuning pipeline on the APPLES dataset for binary OSA severity classification (Severe vs Non-severe, AHI-based). The code lives in the `osa_cls/` directory and is built on top of the shared `cls_core/` module, which provides the pooled LPSGM classifier, the uniform k-fold training protocol, and a frozen-backbone linear probing evaluator used by every downstream disorder-classification task.
-
-**Step 1**: Preprocess the APPLES dataset using `preprocess/APPLES.py` so that subject-level NPZ files appear under `data/APPLES/`. Place the pretrained weights under `weights/`. The binary OSA label file `preprocess/apples_osa_labels.csv` is already included in the repository.
-
-**Step 2**: Run the full pipeline from the repository root:
-
-```bash
-bash osa_cls/run_osa.sh
-```
-
-The script runs a uniform two-stage pipeline: (1) 5-fold stratified cross-validation with 25% of each fold's training set held out for validation (60/20/20 train/val/test split per fold) to fine-tune the pooled LPSGM backbone, and (2) frozen-backbone linear probing, where a single class-weighted logistic regression is fit on the fold's subject-level mean-pooled features and applied directly to the test split. Per-fold outputs (checkpoint, test metrics, linear-probing metrics, predictions, TensorBoard logs) are written to `run_osa/fold{N}/`. The shared training and evaluation logic lives in `cls_core/`.
-
-## Depression Classification
-
-We provide a fine-tuning pipeline on the APPLES dataset for binary depression classification (Depressed vs Non-depressed). The code lives in the `dep_cls/` directory and is built on top of the shared `cls_core/` module, using the same uniform two-stage pipeline as `osa_cls` and `nar_cls`.
-
-**Step 1**: Preprocess the APPLES dataset using `preprocess/APPLES.py` so that subject-level NPZ files appear under `data/APPLES/`. Place the pretrained weights under `weights/`. The binary depression label file `preprocess/apples_dep_labels.csv` is already included in the repository (460 subjects: 327 Non-depressed, 133 Depressed; see the manuscript's Supplementary Methods for the label-derivation criteria that combine the self-reported `depressionmedhxhp` field with HAMD and BDI clinical scale scores).
-
-**Step 2**: Run the full pipeline from the repository root:
-
-```bash
-bash dep_cls/run_dep.sh
-```
-
-Per-fold outputs (checkpoint, test metrics, linear-probing metrics, predictions, TensorBoard logs) are written to `run_dep/fold{N}/`. The shared training and evaluation logic lives in `cls_core/`.
+The pipeline runs four stages (`save_raw` / `gradcam` / `guided` / `render`); see `gradcam/README.md` for the per-stage walkthrough and the aggregation formula.
 
 ## Citation
 
