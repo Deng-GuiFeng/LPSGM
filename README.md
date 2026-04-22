@@ -108,21 +108,19 @@ bash train.sh
 
 **Important**: To reduce memory overhead, the training process doesn't load all samples into memory. Instead, samples are cached in the directory specified by `--cache_root` and loaded dynamically during training. Make sure this directory has enough space to cache the segmented training samples (approximately 1TB as used in our paper).
 
-## Fine-tuning for Sleep Disorder Classification
+## Narcolepsy Classification
 
-We provide fine-tuning code for binary/ternary classification of sleep disorders on the MNC dataset (see our paper for details). The code is in the `nar_cls/` directory.
+We provide a fine-tuning pipeline on the MNC dataset for 3-class narcolepsy classification (Non-narcolepsy Control / Type 1 Narcolepsy / Other Hypersomnia). The code lives in the `nar_cls/` directory and is built on top of the shared `cls_core/` module.
 
-**Step 1**: Preprocess the MNC dataset by running the MNC-related commands in `preprocess.sh`.
+**Step 1**: Preprocess the MNC dataset by running the MNC-related commands in `preprocess.sh` so that subject-level NPZ files appear under `data/MNC-{CNC,DHC,FHC,IHC,KHC,SSC}/`. Each NPZ carries a `Diagnosis` integer field (0 = Non-narcolepsy Control, 1 = Type 1 Narcolepsy, 2 = Other Hypersomnia) used as the subject-level label. Place the pretrained weights under `weights/`.
 
-**Step 2**: Configure the parameters in `nar_cls/run_nar.sh`. The `--merge_NT1` parameter controls the classification task:
-- **With `--merge_NT1`**: Binary classification (merges "Non-Narcolepsy Control" and "Other Hypersomnia" into "Non-T1 Control")
-- **Without `--merge_NT1`**: Ternary classification (three separate classes)
-
-**Step 3**: Run fine-tuning:
+**Step 2**: Run the full pipeline from the repository root:
 
 ```bash
 bash nar_cls/run_nar.sh
 ```
+
+The script runs the same uniform two-stage pipeline as `osa_cls`: (1) 5-fold stratified cross-validation with 25% of each fold's training set held out for validation (60/20/20 train/val/test split per fold) to fine-tune the pooled LPSGM backbone, and (2) frozen-backbone linear probing with a class-weighted logistic regression applied directly to each fold's test split. Per-fold outputs (checkpoint, test metrics, linear-probing metrics, predictions, TensorBoard logs) are written to `run_nar/fold{N}/`. The shared training and evaluation logic lives in `cls_core/`.
 
 ## Grad-CAM Visualization
 

@@ -1,40 +1,47 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/bash
+# MNC 3-class Narcolepsy Classification
+# (Non-narcolepsy Control / Type 1 Narcolepsy / Other Hypersomnia)
+# 5-fold CV with 25% of each fold's training set held out for validation;
+# pooled LPSGM backbone fine-tune -> frozen-backbone linear probing.
+#
+# Usage:
+#   bash nar_cls/run_nar.sh                 # run all 5 folds
+#   bash nar_cls/run_nar.sh 0,1,2           # only folds 0, 1, 2
+#   CUDA_VISIBLE_DEVICES=1 bash nar_cls/run_nar.sh 3,4
+set -e
 
-cd "$(dirname "$0")/.."
+FOLD_IDS="${1:-}"
+RUN_ROOT="./run_nar"
 
-python -m nar_cls.train_narcolepsy \
-  --seq_len 20 \
-  --batch_size 128 \
-  --num_workers 64 \
-  --kfolds 5 \
-  --seed 42 \
-  --train_stride 1 \
-  --val_stride 1 \
-  --test_stride 1 \
-  --pretrained_path weights/ched32_seqed64_ch9_seql20_block4.pth \
-  --architecture cat_cls \
-  --epoch_encoder_dropout 0.1 \
-  --transformer_num_heads 8 \
-  --transformer_dropout 0.1 \
-  --transformer_attn_dropout 0.1 \
-  --ch_num 9 \
-  --ch_emb_dim 32 \
-  --seq_emb_dim 64 \
-  --num_transformer_blocks 4 \
-  --clamp_value 10.0 \
-  --epochs 5 \
-  --warmup_epochs 3 \
-  --lr_backbone 1e-5 \
-  --lr_head 1e-3 \
-  --weight_decay 1e-4 \
-  --eta_min 1e-8 \
-  --grad_clip 1.0 \
-  --class_weight auto \
-  --amp \
-  --eval_every 1 \
-  --enable_train_eval False \
-  --cls_loss_w 1.0 \
-  --run_root ./run_nar \
-  --save_preds \
-  --merge_NT1
+# --- Stage 1: backbone fine-tuning (5-fold + 25% val split) ---
+python -m nar_cls.train \
+    --run_root "$RUN_ROOT" \
+    --fold_ids "$FOLD_IDS" \
+    --kfolds 5 \
+    --val_fraction 0.25 \
+    --epochs 5 \
+    --warmup_epochs 1 \
+    --batch_size 32 \
+    --num_workers 16 \
+    --lr_backbone 1e-6 \
+    --lr_head 1e-4 \
+    --train_stride 5 \
+    --val_stride 1 \
+    --test_stride 1 \
+    --class_weight auto
+
+# --- Stage 2: frozen-backbone linear probing ---
+if [ -z "$FOLD_IDS" ]; then
+    EVAL_FOLDS="0 1 2 3 4"
+else
+    EVAL_FOLDS="${FOLD_IDS//,/ }"
+fi
+
+for FOLD in $EVAL_FOLDS; do
+    python -m nar_cls.simple_eval \
+        --fold "$FOLD" \
+        --run-root "$RUN_ROOT" \
+        --num-classes 3 \
+        --kfolds 5 \
+        --seed 42
+done
