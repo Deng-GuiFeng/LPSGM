@@ -154,6 +154,20 @@ bash osa_cls/run_osa.sh
 
 The script runs a uniform two-stage pipeline: (1) 5-fold stratified cross-validation with 25% of each fold's training set held out for validation (60/20/20 train/val/test split per fold) to fine-tune the pooled LPSGM backbone, and (2) frozen-backbone linear probing, where a single class-weighted logistic regression is fit on the fold's subject-level mean-pooled features and applied directly to the test split. Per-fold outputs (checkpoint, test metrics, linear-probing metrics, predictions, TensorBoard logs) are written to `run_osa/fold{N}/`. The shared training and evaluation logic lives in `cls_core/`.
 
+## Depression Classification
+
+We provide a fine-tuning pipeline on the APPLES dataset for binary depression classification (Depressed vs Non-depressed). The code lives in the `dep_cls/` directory and is built on top of the shared `cls_core/` module, using the same uniform two-stage pipeline as `osa_cls` and `nar_cls`.
+
+**Step 1**: Preprocess the APPLES dataset using `preprocess/APPLES.py` so that subject-level NPZ files appear under `data/APPLES/`. Place the pretrained weights under `weights/`. The binary depression label file `preprocess/apples_dep_labels.csv` is already included in the repository (460 subjects: 327 Non-depressed, 133 Depressed; see the manuscript's Supplementary Methods for the label-derivation criteria that combine the self-reported `depressionmedhxhp` field with HAMD and BDI clinical scale scores).
+
+**Step 2**: Run the full pipeline from the repository root:
+
+```bash
+bash dep_cls/run_dep.sh
+```
+
+Per-fold outputs (checkpoint, test metrics, linear-probing metrics, predictions, TensorBoard logs) are written to `run_dep/fold{N}/`. The shared training and evaluation logic lives in `cls_core/`.
+
 ## Citation
 
 If you use this code or results in your research, please cite:

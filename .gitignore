@@ -7,6 +7,7 @@ weights/
 run/
 run_nar/
 run_osa/
+run_dep/
 
 gradcam_output/
 
