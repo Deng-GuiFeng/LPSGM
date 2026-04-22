@@ -124,6 +124,24 @@ We provide fine-tuning code for binary/ternary classification of sleep disorders
 bash nar_cls/run_nar.sh
 ```
 
+## Grad-CAM Visualization
+
+We provide a Grad-CAM + Guided Backpropagation pipeline for visualizing which PSG signal regions contribute most to LPSGM's sleep stage predictions. The code lives in the `gradcam/` directory and reuses the main `model/` module without duplication. The default configuration targets the MASS-SS1/SS3 datasets as a reproducible public-data example; other recordings can be supported by providing a new channel map in `gradcam/channel_maps.py` and, if the annotation format differs from EDF+, a matching annotation parser in `gradcam/utils.py`.
+
+**Step 1**: Preprocess MASS-SS1/SS3 following `preprocess/MASS-SS1-SS3.py` so that subject-level EDF pairs (`{sub_id} PSG.edf` and `{sub_id} Base.edf`) are available under a source directory. Place the pretrained weights under `weights/`.
+
+**Step 2**: Run the pipeline from the repository root:
+
+```bash
+python -m gradcam.pipeline \
+    --src-root <path_to_mass_edf_root> \
+    --weights weights/ched32_seqed64_ch9_seql20_block4.pth \
+    --output-root gradcam_output \
+    --stages save_raw,gradcam,guided,render
+```
+
+The pipeline runs four stages: (1) LPSGM inference with raw signal caching, (2) dual-branch Grad-CAM at the last convolutional layer of each Epoch Encoder branch, (3) Guided Backpropagation, and (4) per-epoch PNG visualizations fusing Grad-CAM with guided saliency. See `gradcam/README.md` for the aggregation formula and per-file walkthrough.
+
 ## Citation
 
 If you use this code or results in your research, please cite:

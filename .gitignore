@@ -6,8 +6,8 @@ data/
 weights/
 run/
 run_nar/
-gradcam/
 
+gradcam_output/
 
 *.edf
 *.npz
