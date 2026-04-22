@@ -155,8 +155,23 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# --- Constants Definition ---
+SUPPORTED_CHANNELS = ["F3", "F4", "C3", "C4", "O1", "O2", "E1", "E2", "Chin"]
+EPOCH_DURATION_S = 30  # Duration of one epoch in seconds
+RESAMPLE_RATE = 100    # Signal resampling rate in Hz
+EXAMPLE_EDF_PATH = "web_demo/example.edf"  # Path to example EDF file
+TEMP_UPLOAD_PATH = "web_demo/temp_uploaded.edf"  # Temporary path for uploaded EDF files
+
 # --- Session State Initialization ---
 if 'edf_file_path' not in st.session_state:
+    # First run of this browser session: purge any leftover temp upload from a prior
+    # session so one user's file cannot leak to the next. Guarded by `edf_file_path`
+    # being unset so reruns within the same session do not delete the current user's file.
+    if os.path.exists(TEMP_UPLOAD_PATH):
+        try:
+            os.remove(TEMP_UPLOAD_PATH)
+        except OSError:
+            pass
     st.session_state.edf_file_path = None
 if 'available_channels' not in st.session_state:
     st.session_state.available_channels = []
@@ -172,13 +187,6 @@ if 'timescale_s_page' not in st.session_state:
     st.session_state.timescale_s_page = 3600 # Default 3600 seconds per page for signal display
 if 'current_time_offset_s' not in st.session_state:
     st.session_state.current_time_offset_s = 0.0 # Current time offset in seconds (float)
-
-# --- Constants Definition ---
-SUPPORTED_CHANNELS = ["F3", "F4", "C3", "C4", "O1", "O2", "E1", "E2", "Chin"]
-EPOCH_DURATION_S = 30  # Duration of one epoch in seconds
-RESAMPLE_RATE = 100    # Signal resampling rate in Hz
-EXAMPLE_EDF_PATH = "web_demo/example.edf"  # Path to example EDF file
-TEMP_UPLOAD_PATH = "web_demo/temp_uploaded.edf"  # Temporary path for uploaded EDF files
 
 
 def inference(sig_dict, debug=False):
@@ -741,7 +749,12 @@ def main():
     
     # EDF file loading section
     st.markdown('<div class="section-header"><h3>📁 EDF File Loading</h3></div>', unsafe_allow_html=True)
-    
+
+    st.info(
+        "🔒 **Privacy**: Uploads are processed in-session only — not stored or reused, "
+        "and auto-deleted when the session ends."
+    )
+
     col_upload, col_example = st.columns([3, 1])
     with col_upload:
         uploaded_file = st.file_uploader(
