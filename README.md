@@ -142,6 +142,20 @@ python -m gradcam.pipeline \
 
 The pipeline runs four stages: (1) LPSGM inference with raw signal caching, (2) dual-branch Grad-CAM at the last convolutional layer of each Epoch Encoder branch, (3) Guided Backpropagation, and (4) per-epoch PNG visualizations fusing Grad-CAM with guided saliency. See `gradcam/README.md` for the aggregation formula and per-file walkthrough.
 
+## OSA Severity Classification
+
+We provide a fine-tuning pipeline on the APPLES dataset for binary OSA severity classification (Severe vs Non-severe, AHI-based). The code lives in the `osa_cls/` directory and is built on top of the shared `cls_core/` module, which provides the pooled LPSGM classifier, the uniform k-fold training protocol, and a frozen-backbone linear probing evaluator used by every downstream disorder-classification task.
+
+**Step 1**: Preprocess the APPLES dataset using `preprocess/APPLES.py` so that subject-level NPZ files appear under `data/APPLES/`. Place the pretrained weights under `weights/`. The binary OSA label file `preprocess/apples_osa_labels.csv` is already included in the repository.
+
+**Step 2**: Run the full pipeline from the repository root:
+
+```bash
+bash osa_cls/run_osa.sh
+```
+
+The script runs a uniform two-stage pipeline: (1) 5-fold stratified cross-validation with 25% of each fold's training set held out for validation (60/20/20 train/val/test split per fold) to fine-tune the pooled LPSGM backbone, and (2) frozen-backbone linear probing, where a single class-weighted logistic regression is fit on the fold's subject-level mean-pooled features and applied directly to the test split. See `osa_cls/README.md` for the per-fold output layout and `cls_core/` for the shared implementation.
+
 ## Citation
 
 If you use this code or results in your research, please cite:
