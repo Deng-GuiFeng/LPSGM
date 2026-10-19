@@ -112,18 +112,19 @@ bash train.sh
 
 As a downstream application of the pre-trained LPSGM encoder, we provide fine-tuning pipelines for narcolepsy, OSA severity, and depression classification. All three tasks share a unified two-stage protocol: backbone fine-tuning followed by frozen-backbone linear probing with a single class-weighted logistic regression. The shared implementation lives in `cls_core/`; task-specific data adapters and CLIs live in `nar_cls/`, `osa_cls/`, and `dep_cls/`. Per-fold outputs are written under `run_<task>/fold{N}/`.
 
-### Narcolepsy (MNC, 3-class)
+### Narcolepsy (MNC, 3-class and binary)
 
-Classes: Non-narcolepsy Control / Type 1 Narcolepsy / Other Hypersomnia. Labels come from the `Diagnosis` field that the preprocessing scripts write into each subject NPZ.
+Classes: Non-narcolepsy Control / Type 1 Narcolepsy / Other Hypersomnia (3-class), or Normal vs Abnormal with Type 1 Narcolepsy and Other Hypersomnia merged as Abnormal (binary). Labels come from the `Diagnosis` field that the preprocessing scripts write into each subject NPZ; the scripts read the diagnoses from the cohort table `cohorts_deid.xlsx` distributed with the MNC dataset (set its path in `preprocess/MNC/cohort_info.py`).
 
 ```bash
 for c in CNC DHC FHC IHC KHC SSC; do python preprocess/MNC/$c.py; done
-bash nar_cls/run_nar.sh
+bash nar_cls/run_nar.sh                  # 3-class
+TASK=binary bash nar_cls/run_nar.sh      # Normal vs Abnormal
 ```
 
 ### OSA Severity (APPLES, binary)
 
-Classes: Severe vs Non-severe OSA (AHI-based). Labels in `preprocess/apples_osa_labels.csv` (included, 1100 subjects).
+Classes: Severe vs Non-severe OSA (AHI-based). Labels are computed by `preprocess/apples_labels.py` from the `osaseveritypostqc` field of the table `apples-dataset-0.1.0.csv` distributed with the APPLES dataset (1,098 subjects; set the table path in the same script).
 
 ```bash
 python preprocess/APPLES.py
@@ -132,12 +133,39 @@ bash osa_cls/run_osa.sh
 
 ### Depression (APPLES, binary)
 
-Classes: Depressed vs Non-depressed. Labels in `preprocess/apples_dep_labels.csv` (included, 460 subjects; derivation criteria combine the self-reported `depressionmedhxhp` field with HAMD and BDI clinical scale scores).
+Classes: Depressed vs Non-depressed. Labels are computed by `preprocess/apples_labels.py` from the same table (460 subjects; derivation criteria combine the self-reported `depressionmedhxhp` field with the HAMD and BDI clinical scale scores `hamdtotalscore` and `bditotalscore`; see the docstring of `preprocess/apples_labels.py` for the exact rules).
 
 ```bash
 python preprocess/APPLES.py          # skip if already preprocessed
 bash dep_cls/run_dep.sh
 ```
+
+### Cross-Validation Splits
+
+All screening tasks use five-fold stratified subject-level cross-validation, with 25% of each training fold held out for validation. The per-fold train / validation / test subjects used in our paper are provided in `splits/`, one file per task (`mnc_3class_5fold.csv`, `mnc_binary_5fold.csv`, `apples_osa_5fold.csv`, `apples_dep_5fold.csv`) with the columns `subject_id` (the subject directory name written by the preprocessing scripts; for APPLES, the NSRR `fileid`), `fold` and `split`. The files contain no labels; labels are obtained as described above. The scripts above generate the same splits with their default settings, provided that preprocessing yields the same set of subjects.
+
+### Fine-tuned Screening Models
+
+The fine-tuned screening models used in our paper are available in the `screening/` folder of the [Google Drive](https://drive.google.com/drive/folders/1eMuRaK4PelUAh9uG9DR2HXgExNmsoWhx?usp=sharing) that hosts the pre-trained weights. Each task provides one model per cross-validation fold, consisting of the fine-tuned encoder (`best.pth`) and the logistic-regression head (`screening_head.npz`). Place them under `weights/screening/<task>/fold{N}/`, where `<task>` is `mnc_3class`, `mnc_binary`, `apples_osa` or `apples_dep`.
+
+To screen your own recordings, set `CHANNEL_MAP` in `screen.py` to match the channel names of your EDF files (same syntax as `channel_map_for_load_sig` in `inference.py`), then run:
+
+```bash
+python screen.py --model_dir weights/screening/apples_osa/fold0 --edf_dir /path/to/edfs --out osa_fold0.csv
+```
+
+Class probabilities are written to a CSV file, one row per recording, with one column `prob_class{k}` per class `k`: 0 / 1 / 2 = Non-narcolepsy Control / Type 1 Narcolepsy / Other Hypersomnia for `mnc_3class`, and 1 = Abnormal, Severe or Depressed for `mnc_binary`, `apples_osa` and `apples_dep`. Each fold model can be applied on its own; to combine the five fold models as in Cross-Dataset Evaluation, run `screen.py` once per fold and average the class probabilities. Models trained with the scripts above can be used in the same way once `best.pth` and `screening_head.npz` of a fold are placed in one directory.
+
+### Cross-Dataset Evaluation
+
+`nar_cls/transfer.py` (MNC Normal vs Abnormal) and `dep_cls/transfer.py` (APPLES depression) evaluate the screening models on an external cohort: the five fold models of the task are applied as one ensemble, and their class probabilities are averaged. The external cohorts in our paper, HANG7 and SYSU, are private clinical datasets and are not distributed. To evaluate on another cohort, preprocess it into the same NPZ format (see `preprocess/`) and provide a label CSV with the columns described in the docstring of the corresponding script:
+
+```bash
+python -m nar_cls.transfer --model-root weights/screening/mnc_binary \
+    --data-root data/<cohort> --label-csv <labels.csv> --out-dir run_transfer/<cohort>
+```
+
+Metrics are written to `transfer_eval.json` and per-subject probabilities to `transfer_preds.npz`.
 
 ## Grad-CAM Visualization
 
