@@ -22,7 +22,7 @@ import shutil
 from multiprocessing import Pool
 from tqdm import tqdm
 
-from cohort_info import Cohort_DHC, Diagnosis_Mapping
+from cohort_info import Diagnosis_Mapping, load_cohort
 from utils import load_sig, pre_process, save
 
 
@@ -121,6 +121,9 @@ if __name__ == "__main__":
     src_root = r"/nvme1/denggf/PSG_datasets/public_datasets/mnc/dhc/"
     # Destination directory to save preprocessed data
     dst_root = r"./data/MNC-DHC/"
+    # Subject-to-diagnosis mapping of the cohort, read from the NSRR cohort table
+    # (cohorts_deid.xlsx; path set in cohort_info.DEFAULT_COHORTS_XLSX)
+    Cohort_DHC = load_cohort('DHC')
     # Remove existing destination directory to ensure clean preprocessing output
     shutil.rmtree(dst_root, ignore_errors=True)
 

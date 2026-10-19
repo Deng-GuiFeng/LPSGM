@@ -8,8 +8,8 @@ All downstream tasks (narcolepsy / OSA / depression) store preprocessed PSG
 data as one or more NPZ files per subject under ``data/<dataset>/<subject_id>/``,
 with channels as separate arrays inside each NPZ file. This module provides:
 
-- ``load_subjects_from_csv``: resolve subject NPZ directories + labels from a
-  task-specific label CSV.
+- ``load_subjects_from_labels`` / ``load_subjects_from_csv``: resolve subject
+  NPZ directories + labels from an ``{id: label}`` map or a label CSV.
 - ``SubjectWindowedDataset``: in-memory-preloaded PyTorch Dataset that slices
   each subject's recording into fixed-length windows of 30-second epochs.
 - ``collate_fn``: padding-aware batch collation matching the LPSGM backbone's
@@ -35,36 +35,44 @@ from torch.utils.data import DataLoader, Dataset
 from dataset.dataset import CHANNEL_TO_INDEX
 
 
-def load_subjects_from_csv(
-    csv_path: str,
+def has_full_window(subj_dir: str, seq_len: int = 20) -> bool:
+    """
+    Return True if at least one NPZ segment of the subject spans ``seq_len`` epochs.
+
+    Windows never cross segment boundaries, so a subject whose segments are all
+    shorter than ``seq_len`` contributes no window and cannot be evaluated.
+    Only the small ``Hypnogram`` array is read.
+    """
+    for f in sorted(os.listdir(subj_dir)):
+        if not f.endswith('.npz'):
+            continue
+        with np.load(os.path.join(subj_dir, f)) as npz:
+            if 'Hypnogram' in npz:
+                n = int(npz['Hypnogram'].shape[0])
+            else:
+                first = next((k for k in npz.files if k in CHANNEL_TO_INDEX), None)
+                n = int(npz[first].shape[0]) if first else 0
+        if n >= seq_len:
+            return True
+    return False
+
+
+def load_subjects_from_labels(
+    id2label: Dict[str, int],
     data_root: str,
-    id_col: str = 'fileid',
-    label_col: str = 'label',
+    seq_len: int = 20,
 ) -> Tuple[List[str], List[int], List[str]]:
     """
-    Resolve ``(subject_dirs, labels, subject_ids)`` from a label CSV and NPZ root.
+    Resolve ``(subject_dirs, labels, subject_ids)`` from an ``{id: label}`` map and NPZ root.
 
-    Each row of ``csv_path`` must contain ``id_col`` (subject identifier
-    matching a subdirectory name under ``data_root``) and ``label_col`` (integer
-    class label). Subjects without a matching NPZ-containing directory on
-    disk are silently skipped.
-
-    Args:
-        csv_path: Path to the label CSV.
-        data_root: Root directory containing ``{data_root}/{subject_id}/*.npz``.
-        id_col: Column name in the CSV that holds the subject identifier.
-        label_col: Column name that holds the integer class label.
+    Subjects without a matching NPZ-containing directory under ``data_root``,
+    or without any segment long enough for one ``seq_len``-epoch window, are
+    skipped.
 
     Returns:
         Tuple ``(subject_dirs, labels, subject_ids)`` where the three lists are
         aligned and sorted by subject_id.
     """
-    id2label: Dict[str, int] = {}
-    with open(csv_path, 'r') as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            id2label[row[id_col]] = int(row[label_col])
-
     data_root = os.path.realpath(data_root)
 
     subject_dirs, subject_labels, subject_ids = [], [], []
@@ -73,12 +81,34 @@ def load_subjects_from_csv(
         if not os.path.isdir(subj_dir):
             continue
         npzs = [f for f in os.listdir(subj_dir) if f.endswith('.npz')]
-        if not npzs:
+        if not npzs or not has_full_window(subj_dir, seq_len):
             continue
         subject_dirs.append(subj_dir)
-        subject_labels.append(id2label[sid])
+        subject_labels.append(int(id2label[sid]))
         subject_ids.append(sid)
     return subject_dirs, subject_labels, subject_ids
+
+
+def load_subjects_from_csv(
+    csv_path: str,
+    data_root: str,
+    id_col: str = 'fileid',
+    label_col: str = 'label',
+    seq_len: int = 20,
+) -> Tuple[List[str], List[int], List[str]]:
+    """
+    Resolve ``(subject_dirs, labels, subject_ids)`` from a label CSV and NPZ root.
+
+    Each row of ``csv_path`` must contain ``id_col`` (subject identifier
+    matching a subdirectory name under ``data_root``) and ``label_col`` (integer
+    class label). See ``load_subjects_from_labels`` for which subjects are kept.
+    """
+    id2label: Dict[str, int] = {}
+    with open(csv_path, 'r') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            id2label[row[id_col]] = int(row[label_col])
+    return load_subjects_from_labels(id2label, data_root, seq_len=seq_len)
 
 
 # --------- module-level helper for multiprocessing pool ---------
