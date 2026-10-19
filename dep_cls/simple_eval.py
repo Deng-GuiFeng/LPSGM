@@ -14,4 +14,12 @@ from .dataset import load_subjects
 
 
 if __name__ == '__main__':
-    cli_main(load_subjects, default_run_root='./run_dep', default_num_classes=2)
+    cli_main(
+        load_subjects,
+        default_run_root='./run_dep',
+        default_num_classes=2,
+        default_seed=6,
+        default_C=10.0,
+        default_penalty='l1',
+        default_standardize=False,
+    )

@@ -6,8 +6,10 @@ data/
 weights/
 run/
 run_nar/
+run_nar_binary/
 run_osa/
 run_dep/
+run_transfer/
 
 gradcam_output/
 

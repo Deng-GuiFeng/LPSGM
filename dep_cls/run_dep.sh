@@ -25,8 +25,8 @@ python -m dep_cls.train \
     --lr_backbone 1e-6 \
     --lr_head 1e-4 \
     --train_stride 5 \
-    --val_stride 1 \
-    --test_stride 1 \
+    --val_stride 5 \
+    --test_stride 5 \
     --class_weight auto
 
 # --- Stage 2: frozen-backbone linear probing ---
@@ -42,5 +42,5 @@ for FOLD in $EVAL_FOLDS; do
         --run-root "$RUN_ROOT" \
         --num-classes 2 \
         --kfolds 5 \
-        --seed 42
+        --seed 6
 done

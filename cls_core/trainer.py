@@ -81,8 +81,8 @@ class TrainConfig:
     batch_size: int = 32
     num_workers: int = 16
     train_stride: int = 5
-    val_stride: int = 1
-    test_stride: int = 1
+    val_stride: int = 5
+    test_stride: int = 5
 
     # -- Cross-validation --
     kfolds: int = 5
@@ -111,9 +111,10 @@ class TrainConfig:
 class WarmupCosineAnnealingLR(CosineAnnealingLR):
     """Cosine-annealing scheduler with a linear warmup prefix."""
 
-    def __init__(self, optimizer, T_max, warmup_epoch, eta_min=0, last_epoch=-1, verbose=False):
+    def __init__(self, optimizer, T_max, warmup_epoch, eta_min=0, last_epoch=-1):
         self.warmup_epoch = warmup_epoch
-        super().__init__(optimizer, T_max, eta_min, last_epoch, verbose)
+        # ``verbose`` is not forwarded: it was removed from torch LR schedulers in recent releases.
+        super().__init__(optimizer, T_max, eta_min, last_epoch)
 
     def get_lr(self):
         if self.last_epoch < self.warmup_epoch:

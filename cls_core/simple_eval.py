@@ -8,12 +8,19 @@ Per fold:
 
 1. Load the fold's fine-tuned LPSGM backbone checkpoint.
 2. For each subject, extract the mean-pooled ``feat_dim``-dim sequence feature
-   averaged over every sliding window of the subject.
-3. Fit a single class-weighted logistic regression on the per-subject mean
-   features from the outer fold's trainval split (80 % of subjects).
+   averaged over all non-overlapping ``seq_len``-epoch windows of the subject
+   (stride = ``seq_len``).
+3. Standardize the features with training-set statistics (optional) and fit
+   a single class-weighted logistic regression (L2 or L1 penalty) on the
+   per-subject features from the outer fold's trainval split (80 % of
+   subjects).
 4. Apply the logistic regression directly to the outer test split (20 %) and
-   report AUC / accuracy / balanced accuracy / macro F1 / per-class F1 /
-   confusion matrix.
+   report AUC / accuracy / balanced accuracy / Cohen's kappa / macro F1 /
+   per-class F1 / confusion matrix.
+5. Save the fitted standardization parameters and logistic-regression head
+   (``screening_head.npz``) next to the fold's backbone checkpoint, so that
+   the fine-tuned encoder plus head can be applied to new recordings
+   (see ``screen.py``).
 
 The evaluator reuses exactly the same ``StratifiedKFold`` outer split as
 ``trainer.PooledTrainer`` (same ``n_splits``, ``shuffle=True`` and
@@ -33,6 +40,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
     accuracy_score,
     balanced_accuracy_score,
+    cohen_kappa_score,
     confusion_matrix,
     f1_score,
     roc_auc_score,
@@ -114,6 +122,16 @@ def _load_backbone(ckpt_path: str, num_classes: int, arch_overrides: Optional[di
     return model.cuda().eval()
 
 
+def _fitted_scaler(mean: np.ndarray, scale: np.ndarray) -> StandardScaler:
+    """Build a fitted ``StandardScaler`` from stored mean and scale vectors."""
+    scaler = StandardScaler()
+    scaler.mean_ = mean
+    scaler.scale_ = scale
+    scaler.var_ = scale ** 2
+    scaler.n_features_in_ = int(mean.shape[0])
+    return scaler
+
+
 def run_simple_eval(
     fold_id: int,
     subjects,
@@ -122,12 +140,15 @@ def run_simple_eval(
     kfolds: int = 5,
     seed: int = 42,
     seq_len: int = 20,
-    stride: int = 5,
+    stride: Optional[int] = None,
     batch_size: int = 64,
     num_workers: int = 4,
-    C: float = 1.0,
+    C: float = 0.01,
+    penalty: str = 'l2',
+    standardize: bool = True,
     arch_overrides: Optional[dict] = None,
     ckpt_path: Optional[str] = None,
+    save_features: bool = True,
 ) -> dict:
     """
     Run ``simple_eval`` for a single fold.
@@ -142,17 +163,27 @@ def run_simple_eval(
         kfolds: Outer k-fold count. Must match the trainer's configuration.
         seed: Random seed. Must match the trainer's configuration.
         seq_len, stride, batch_size, num_workers: Feature-extraction knobs.
+            ``stride`` defaults to ``seq_len`` (non-overlapping windows).
         C: Inverse regularization strength of the logistic regression.
+        penalty: ``'l2'`` (lbfgs solver) or ``'l1'`` (liblinear solver; binary tasks only).
+        standardize: Standardize features with training-set statistics. When
+            disabled, an identity transform is stored in the screening head.
         arch_overrides: Optional dict of backbone architecture overrides when
             the checkpoint was trained with non-default values.
         ckpt_path: Optional explicit checkpoint path. Defaults to
             ``{run_root}/fold{fold_id}/model_dir/best.pth``.
+        save_features: Also save the per-subject features of this fold
+            (``simple_features.npz``).
 
     Returns:
         Result dictionary; also written to ``{run_root}/fold{fold_id}/simple_eval.json``.
     """
+    if penalty == 'l1' and num_classes > 2:
+        raise ValueError("penalty='l1' (liblinear solver) supports binary tasks only")
     subject_dirs, labels, _subject_ids = subjects
     labels_arr = np.array(labels)
+    if stride is None:
+        stride = seq_len
 
     # Outer k-fold split, matched to the trainer.
     skf = StratifiedKFold(n_splits=kfolds, shuffle=True, random_state=seed)
@@ -189,18 +220,26 @@ def run_simple_eval(
     )
 
     # Extract subject-level mean-pooled features.
-    X_train, y_train, _ = _extract_subject_features(model, train_loader, f'train fold{fold_id}')
+    X_train, y_train, train_sids = _extract_subject_features(model, train_loader, f'train fold{fold_id}')
     X_test, y_test, test_sids = _extract_subject_features(model, test_loader, f'test fold{fold_id}')
     print(f'X_train: {X_train.shape}, X_test: {X_test.shape}')
 
     # Standardize features using train-only statistics.
-    scaler = StandardScaler()
-    X_train_n = scaler.fit_transform(X_train)
+    if standardize:
+        scaler = StandardScaler()
+        X_train_n = scaler.fit_transform(X_train)
+    else:
+        scaler = _fitted_scaler(np.zeros(X_train.shape[1]), np.ones(X_train.shape[1]))
+        X_train_n = scaler.transform(X_train)
     X_test_n = scaler.transform(X_test)
 
     # Fit a single class-weighted logistic regression on the trainval split
     # and apply it directly to the test split (no threshold tuning).
-    clf = LogisticRegression(C=C, max_iter=5000, class_weight='balanced', random_state=42)
+    if penalty == 'l1':
+        clf = LogisticRegression(penalty='l1', solver='liblinear', C=C, max_iter=5000,
+                                 class_weight='balanced', random_state=42)
+    else:
+        clf = LogisticRegression(C=C, max_iter=5000, class_weight='balanced', random_state=42)
     clf.fit(X_train_n, y_train)
     test_probs = clf.predict_proba(X_test_n)
     test_preds = clf.predict(X_test_n)
@@ -219,6 +258,7 @@ def run_simple_eval(
     mf1 = float(f1_score(y_test, test_preds, average='macro'))
     bal = float(balanced_accuracy_score(y_test, test_preds))
     acc = float(accuracy_score(y_test, test_preds))
+    kappa = float(cohen_kappa_score(y_test, test_preds))
     cm = confusion_matrix(y_test, test_preds).tolist()
     pcf1 = f1_score(y_test, test_preds, average=None).tolist()
 
@@ -227,12 +267,15 @@ def run_simple_eval(
         'ckpt': ckpt_path,
         'method': 'frozen_backbone_linear_probing',
         'feature_dim': int(X_train.shape[1]),
-        'classifier': f'LogisticRegression(C={C}, class_weight=balanced)',
+        'feature_windows': f'seq_len={seq_len}, stride={stride}',
+        'feature_standardization': bool(standardize),
+        'classifier': f'LogisticRegression(penalty={penalty}, C={C}, class_weight=balanced)',
         'test_metrics': {
             'macro_f1': mf1,
             'balanced_accuracy': bal,
             'auc': auc,
             'accuracy': acc,
+            'kappa': kappa,
             'per_class_f1': pcf1,
             'confusion_matrix': cm,
         },
@@ -241,7 +284,7 @@ def run_simple_eval(
     }
 
     print(f'\n=== Fold {fold_id} simple_eval ===')
-    print(f'  MF1={mf1:.4f} bal={bal:.4f} AUC={auc:.4f} acc={acc:.4f}')
+    print(f'  MF1={mf1:.4f} bal={bal:.4f} AUC={auc:.4f} acc={acc:.4f} kappa={kappa:.4f}')
     print(f'  CM={cm}')
 
     out_dir = os.path.join(run_root, f'fold{fold_id}')
@@ -260,10 +303,59 @@ def run_simple_eval(
     )
     print(f'Saved: {preds_path}')
 
+    # Screening head: standardization + logistic regression, stored as plain
+    # arrays so it can be reloaded without pickling (see ``load_screening_head``).
+    head_path = os.path.join(out_dir, 'screening_head.npz')
+    np.savez(
+        head_path,
+        scaler_mean=scaler.mean_.astype(np.float64),
+        scaler_scale=scaler.scale_.astype(np.float64),
+        coef=clf.coef_.astype(np.float64),
+        intercept=clf.intercept_.astype(np.float64),
+        classes=clf.classes_.astype(np.int64),
+        seq_len=np.int64(seq_len),
+        stride=np.int64(stride),
+    )
+    print(f'Saved: {head_path}')
+
+    if save_features:
+        feat_path = os.path.join(out_dir, 'simple_features.npz')
+        np.savez(
+            feat_path,
+            X_train=X_train, y_train=np.array(y_train, dtype=np.int64), train_ids=np.array(train_sids),
+            X_test=X_test, y_test=np.array(y_test, dtype=np.int64), test_ids=np.array(test_sids),
+        )
+        print(f'Saved: {feat_path}')
+
     return result
 
 
-def cli_main(load_subjects_fn, default_run_root: str = './run', default_num_classes: int = 2):
+def load_screening_head(head_path: str):
+    """
+    Rebuild the ``(StandardScaler, LogisticRegression)`` pair saved by ``run_simple_eval``.
+
+    Returns:
+        Tuple ``(scaler, clf)`` ready for ``clf.predict_proba(scaler.transform(X))``.
+    """
+    h = np.load(head_path)
+    scaler = _fitted_scaler(h['scaler_mean'], h['scaler_scale'])
+    clf = LogisticRegression()
+    clf.coef_ = h['coef']
+    clf.intercept_ = h['intercept']
+    clf.classes_ = h['classes']
+    clf.n_features_in_ = int(h['coef'].shape[1])
+    return scaler, clf
+
+
+def cli_main(
+    load_subjects_fn,
+    default_run_root: str = './run',
+    default_num_classes: int = 2,
+    default_seed: int = 42,
+    default_C: float = 0.01,
+    default_penalty: str = 'l2',
+    default_standardize: bool = True,
+):
     """
     Shared ``python -m`` entry point body. Task CLIs call this function, passing
     their own ``load_subjects`` implementation and defaults.
@@ -273,12 +365,17 @@ def cli_main(load_subjects_fn, default_run_root: str = './run', default_num_clas
     p.add_argument('--run-root', type=str, default=default_run_root)
     p.add_argument('--num-classes', type=int, default=default_num_classes)
     p.add_argument('--kfolds', type=int, default=5)
-    p.add_argument('--seed', type=int, default=42)
+    p.add_argument('--seed', type=int, default=default_seed)
     p.add_argument('--seq-len', type=int, default=20)
-    p.add_argument('--stride', type=int, default=5)
+    p.add_argument('--stride', type=int, default=None,
+                   help='Window stride in epochs for feature extraction; '
+                        'defaults to --seq-len (non-overlapping windows).')
     p.add_argument('--batch-size', type=int, default=64)
     p.add_argument('--num-workers', type=int, default=4)
-    p.add_argument('--C', type=float, default=1.0)
+    p.add_argument('--C', type=float, default=default_C)
+    p.add_argument('--penalty', type=str, default=default_penalty, choices=['l2', 'l1'])
+    p.add_argument('--standardize', action=argparse.BooleanOptionalAction, default=default_standardize,
+                   help='Standardize features with training-set statistics (--no-standardize to disable).')
     p.add_argument('--ckpt', type=str, default=None,
                    help='Explicit checkpoint path; defaults to '
                         '{run-root}/fold{fold}/model_dir/best.pth')
@@ -302,5 +399,7 @@ def cli_main(load_subjects_fn, default_run_root: str = './run', default_num_clas
         batch_size=args.batch_size,
         num_workers=args.num_workers,
         C=args.C,
+        penalty=args.penalty,
+        standardize=args.standardize,
         ckpt_path=args.ckpt,
     )

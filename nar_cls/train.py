@@ -2,11 +2,11 @@
 """
 train.py
 
-CLI entry point for MNC 3-class narcolepsy fine-tuning.
+CLI entry point for MNC narcolepsy fine-tuning (3-class or Normal vs Abnormal).
 
 Delegates all training logic to ``cls_core.trainer.PooledTrainer``. This
-module only defines argparse defaults specific to the MNC 3-class task and
-wires in the task's ``load_subjects`` implementation and label names.
+module only defines argparse defaults specific to the MNC tasks and wires in
+the task's ``load_subjects`` implementation and label names.
 """
 
 import argparse
@@ -14,11 +14,11 @@ import os
 
 from cls_core.trainer import PooledTrainer, TrainConfig
 
-from .dataset import DEFAULT_DATA_ROOT, LABEL_NAMES, load_subjects
+from .dataset import DEFAULT_DATA_ROOT, TASKS, load_subjects
 
 
 def parse_args():
-    p = argparse.ArgumentParser(description='MNC 3-class narcolepsy classification')
+    p = argparse.ArgumentParser(description='MNC narcolepsy classification')
 
     # -- Model architecture (match pretrained LPSGM backbone) --
     p.add_argument('--architecture', type=str, default='cat_cls')
@@ -34,7 +34,9 @@ def parse_args():
     p.add_argument('--clamp_value', type=float, default=10.0)
 
     # -- Task --
-    p.add_argument('--num_classes', type=int, default=3)
+    p.add_argument('--task', type=str, default='3class', choices=sorted(TASKS),
+                   help="'3class' (Control / NT1 / Other Hypersomnia) or "
+                        "'binary' (Normal vs Abnormal); sets the number of classes.")
 
     # -- Data --
     p.add_argument('--label_csv', type=str, default='')
@@ -42,8 +44,8 @@ def parse_args():
     p.add_argument('--batch_size', type=int, default=32)
     p.add_argument('--num_workers', type=int, default=16)
     p.add_argument('--train_stride', type=int, default=5)
-    p.add_argument('--val_stride', type=int, default=1)
-    p.add_argument('--test_stride', type=int, default=1)
+    p.add_argument('--val_stride', type=int, default=5)
+    p.add_argument('--test_stride', type=int, default=5)
 
     # -- Cross-validation --
     p.add_argument('--kfolds', type=int, default=5)
@@ -71,17 +73,22 @@ def parse_args():
     p.add_argument('--freeze_backbone', action='store_true', default=False)
 
     # -- Output --
-    p.add_argument('--run_root', type=str, default='./run_nar')
+    p.add_argument('--run_root', type=str, default=None,
+                   help="Defaults to './run_nar' (3class) or './run_nar_binary' (binary).")
     p.add_argument('--save_preds', action='store_true', default=True)
 
     return p.parse_args()
 
 
 def main():
-    args = parse_args()
-    cfg = TrainConfig(**vars(args))
-    subjects = load_subjects(cfg.data_root)
-    trainer = PooledTrainer(cfg, subjects, label_names=LABEL_NAMES)
+    args = vars(parse_args())
+    task = args.pop('task')
+    if args['run_root'] is None:
+        args['run_root'] = './run_nar' if task == '3class' else './run_nar_binary'
+    num_classes, label_names = TASKS[task]
+    cfg = TrainConfig(num_classes=num_classes, **args)
+    subjects = load_subjects(cfg.data_root, task=task)
+    trainer = PooledTrainer(cfg, subjects, label_names=label_names)
     trainer.run()
 
 

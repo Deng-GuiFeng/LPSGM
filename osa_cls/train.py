@@ -37,13 +37,15 @@ def parse_args():
     p.add_argument('--num_classes', type=int, default=2)
 
     # -- Data --
-    p.add_argument('--label_csv', type=str, default=DEFAULT_LABEL_CSV)
+    p.add_argument('--label_csv', type=str, default=DEFAULT_LABEL_CSV,
+                   help='Path to the NSRR APPLES dataset table (apples-dataset-0.1.0.csv); '
+                        'labels are derived from it by preprocess/apples_labels.py.')
     p.add_argument('--data_root', type=str, default=DEFAULT_DATA_ROOT)
     p.add_argument('--batch_size', type=int, default=32)
     p.add_argument('--num_workers', type=int, default=16)
     p.add_argument('--train_stride', type=int, default=5)
-    p.add_argument('--val_stride', type=int, default=1)
-    p.add_argument('--test_stride', type=int, default=1)
+    p.add_argument('--val_stride', type=int, default=5)
+    p.add_argument('--test_stride', type=int, default=5)
 
     # -- Cross-validation --
     p.add_argument('--kfolds', type=int, default=5)
