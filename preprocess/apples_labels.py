@@ -7,9 +7,8 @@ Derive the APPLES screening labels directly from the NSRR APPLES dataset table
 files). No per-subject label file is shipped with this repository; labels are
 recomputed from the raw NSRR fields every time a task loads its subjects.
 
-The NSRR table has one row per participant visit. Clinical variables used
-here are recorded at the baseline visit, while the PSG ``fileid`` is recorded
-at the diagnostic visit; the two are linked through ``appleid``.
+The NSRR table has one row per participant visit; each PSG ``fileid`` is
+linked to the participant's clinical variables through ``appleid``.
 
 Depression (surrogate label; see Supplementary Methods):
     - Depressed (1): ``depressionmedhxhp`` = 2 (ongoing depression history) and
@@ -43,11 +42,11 @@ OSA_FIELDS = ['osaseveritypostqc']
 
 
 def _per_subject_table(nsrr_csv: str, fields) -> pd.DataFrame:
-    """Return one row per PSG ``fileid`` with the requested baseline fields."""
+    """Return one row per PSG ``fileid`` with the requested clinical fields."""
     df = pd.read_csv(nsrr_csv, low_memory=False)
     psg = df.loc[df['fileid'].notna(), ['appleid', 'fileid']].drop_duplicates('appleid')
-    baseline = df.loc[df['visitn'] == 1, ['appleid'] + list(fields)].drop_duplicates('appleid')
-    table = psg.merge(baseline, on='appleid', how='left')
+    clinical = df.loc[df['visitn'] == 1, ['appleid'] + list(fields)].drop_duplicates('appleid')
+    table = psg.merge(clinical, on='appleid', how='left')
     for f in fields:
         # Categorical fields are stored as "<code>) <text>" (e.g. "3) severe");
         # keep the leading numeric code. Numeric fields pass through unchanged.
