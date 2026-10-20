@@ -4,6 +4,7 @@
 # Deep Learning Framework
 torch==2.0.0
 # Note: For CUDA support, install with: pip install torch==2.0.0+cu117 -f https://download.pytorch.org/whl/torch_stable.html
+tensorboard==2.18.0
 
 # Scientific Computing
 numpy==1.23.5
