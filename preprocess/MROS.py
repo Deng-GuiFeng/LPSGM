@@ -15,7 +15,7 @@ Key functionalities:
 - Saving preprocessed signals and annotations for downstream model training.
 - Multiprocessing support for scalable dataset processing.
 
-This preprocessing is critical for preparing the MROS dataset for sleep staging and mental disorder diagnosis tasks
+This preprocessing is critical for preparing the MROS dataset for sleep staging and downstream clinical screening tasks
 within the LPSGM framework.
 """
 

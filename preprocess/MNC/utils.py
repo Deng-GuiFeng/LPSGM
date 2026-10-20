@@ -7,7 +7,7 @@ Utilities for preprocessing and handling the MNC (Multi-Night Cohort) dataset wi
 This module provides functions to load raw PSG signals from EDF files, preprocess signals with filtering,
 resampling, and epoch segmentation, and save processed data in a structured format. It supports flexible
 channel selection, including differential channel computation, and ensures signals are standardized for
-subsequent modeling tasks such as sleep staging and mental disorder diagnosis.
+subsequent modeling tasks such as sleep staging and downstream clinical screening.
 
 Key functionalities:
 - Loading raw signals with flexible channel mapping

@@ -6,7 +6,7 @@ This utility module provides helper functions and classes used throughout the LP
 It includes tools for metrics calculation, model parameter summarization, random seed setting,
 string parsing, and file searching. These utilities facilitate consistent evaluation of model
 performance, reproducibility, and general-purpose operations needed across different components
-of the Large Polysomnography Model (LPSGM) for sleep staging and mental disorder diagnosis.
+of the Large Polysomnography Model (LPSGM) for sleep staging and downstream clinical screening.
 """
 
 import numpy as np

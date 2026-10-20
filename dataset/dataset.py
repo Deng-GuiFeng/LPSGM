@@ -7,7 +7,7 @@ for the LPSGM project. It defines channel mappings relevant to PSG data processi
 to retrieve subject paths and their corresponding domain labels from specified dataset domains.
 
 The file plays a foundational role in dataset management, enabling downstream data loading and preprocessing
-for sleep staging and mental disorder diagnosis tasks within the LPSGM framework.
+for sleep staging and downstream clinical screening tasks within the LPSGM framework.
 """
 
 from sklearn.model_selection import StratifiedKFold, train_test_split

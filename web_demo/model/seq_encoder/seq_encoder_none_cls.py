@@ -7,7 +7,7 @@ based on Transformer blocks without using a traditional CLS token for classifica
 It is designed for the LPSGM project to capture temporal dependencies in polysomnography 
 (PSG) data sequences. The encoder incorporates spatial and temporal embeddings and applies 
 multiple Transformer blocks to extract meaningful sequence-level features for downstream 
-tasks such as sleep staging and mental disorder diagnosis.
+tasks such as sleep staging and downstream clinical screening.
 
 Key features:
 - Spatial embedding for channel information

@@ -4,11 +4,11 @@ model.py
 
 Main LPSGM model integrating epoch encoder, sequence encoder, and classifier.
 
-This module defines the LPSGM class, which implements the core architecture of the Large Polysomnography Model (LPSGM) for sleep staging and mental disorder diagnosis. 
+This module defines the LPSGM class, which implements the core architecture of the Large Polysomnography Model (LPSGM) for sleep staging and downstream clinical screening. 
 The model consists of three main components:
 1. Epoch Encoder: A dual-branch CNN that extracts features from 30-second PSG epochs.
 2. Sequence Encoder: Transformer-based encoder that captures temporal dependencies across sequences of epochs.
-3. Classifier: Predicts sleep stages or mental disorder classes based on encoded features.
+3. Classifier: Predicts sleep stages or screening classes based on encoded features.
 
 The model supports multiple architectural variants for sequence encoding and flexible channel configurations, enabling robust representation learning from multi-channel PSG data.
 """

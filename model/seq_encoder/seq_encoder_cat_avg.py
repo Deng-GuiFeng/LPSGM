@@ -11,7 +11,7 @@ Key functionality includes averaging features across channels for each time step
 enabling flexible channel configurations and robust sequence representation. 
 
 This encoder is a critical component of the LPSGM model, facilitating effective 
-sleep staging and mental disorder diagnosis by modeling temporal dynamics in PSG data.
+sleep staging and downstream clinical screening by modeling temporal dynamics in PSG data.
 """
 
 import torch

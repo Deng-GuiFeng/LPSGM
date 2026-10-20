@@ -13,7 +13,7 @@ Key functionalities include:
 - Parallel processing of multiple recordings to accelerate dataset preparation.
 - Integration with utility functions for signal loading, preprocessing, unknown label removal, and data saving.
 
-This preprocessing step is critical for preparing the BOAS dataset for downstream sleep staging and mental disorder diagnosis tasks.
+This preprocessing step is critical for preparing the BOAS dataset for downstream sleep staging and clinical screening tasks.
 """
 
 import os

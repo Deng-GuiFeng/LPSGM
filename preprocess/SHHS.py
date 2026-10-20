@@ -14,7 +14,7 @@ SHHS.py
 This module handles preprocessing of the Sleep Heart Health Study (SHHS) polysomnography (PSG) dataset for the LPSGM project.
 It loads raw PSG signals and corresponding annotations, performs signal preprocessing and synchronization,
 removes unwanted wake epochs at the start and end of recordings, filters out unknown sleep stage labels,
-and saves the cleaned data for downstream sleep staging and mental disorder diagnosis tasks.
+and saves the cleaned data for downstream sleep staging and clinical screening tasks.
 
 Key functionalities:
 - Parsing XML annotation files to extract sleep stages

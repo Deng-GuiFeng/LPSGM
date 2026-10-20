@@ -4,7 +4,7 @@ CCSHS.py
 
 This module handles the preprocessing of the CCSHS (Chinese Clinical Sleep Health Study) dataset for the LPSGM project.
 It includes loading and processing polysomnography (PSG) signals and corresponding sleep stage annotations,
-resampling signals, removing unknown labels, and saving the processed data for downstream sleep staging and mental disorder diagnosis tasks.
+resampling signals, removing unknown labels, and saving the processed data for downstream sleep staging and clinical screening tasks.
 
 Key functionalities:
 - Parsing XML annotation files to extract sleep stages and remapping stages to standard labels

@@ -6,7 +6,7 @@ This module defines the EpochEncoder class, a dual-branch convolutional neural n
 to extract robust feature representations from 30-second polysomnography (PSG) epochs. The encoder 
 processes raw PSG signals through two parallel convolutional branches with different receptive fields 
 to capture multi-scale temporal features. The extracted features serve as input embeddings for subsequent 
-sequence modeling in the LPSGM framework, facilitating sleep staging and mental disorder diagnosis tasks.
+sequence modeling in the LPSGM framework, facilitating sleep staging and downstream clinical screening tasks.
 
 The design is adapted and modified from the DeepSleepNet architecture, optimized for large-scale PSG data.
 

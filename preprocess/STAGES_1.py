@@ -16,7 +16,7 @@ Main functionalities:
 - Support parallel processing of multiple subjects for efficiency
 
 This preprocessing is essential for preparing the STAGES dataset for downstream 
-sleep staging and mental disorder diagnosis tasks using the LPSGM model.
+sleep staging and downstream clinical screening tasks using the LPSGM model.
 """
 
 import numpy as np

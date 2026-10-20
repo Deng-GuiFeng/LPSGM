@@ -6,7 +6,7 @@ This script performs preprocessing of the STAGES polysomnography (PSG) datasets 
 It processes raw PSG recordings and their annotations from multiple STAGES sub-datasets, extracting
 and aligning EEG/EOG/EMG signal epochs with corresponding sleep stage labels. The preprocessing includes
 signal loading, timestamp synchronization, epoch extraction, signal resampling, and saving the processed
-data in a standardized format for downstream sleep staging and mental disorder diagnosis tasks.
+data in a standardized format for downstream sleep staging and clinical screening tasks.
 
 Key functionalities:
 - Load raw EDF signals and CSV annotations for each subject

@@ -6,7 +6,7 @@ This script performs sleep stage prediction inference using the LPSGM (Large Pol
 It processes raw PSG EDF files by loading and preprocessing signals, then generates hypnograms (sleep stage sequences)
 using the trained model. The script supports batch processing of EDF files in a directory and saves the predicted
 hypnograms as text files. This inference pipeline is a key component for applying LPSGM to new PSG recordings
-for sleep staging and mental disorder diagnosis.
+for sleep staging and downstream clinical screening.
 """
 
 from web_demo.inference_backend import inference_recodings

@@ -6,8 +6,8 @@ This module provides functionality to preprocess the MASS-SS1 and MASS-SS3 polys
 for use in the LPSGM project. It includes loading raw PSG signals and annotations, aligning signals with
 sleep stage annotations, resampling, removing unknown labels, and saving the processed data in a standardized
 format. The preprocessing ensures that the PSG signals and corresponding sleep stage labels are synchronized
-and segmented into 30-second epochs, which are essential for subsequent sleep staging and mental disorder
-diagnosis tasks.
+and segmented into 30-second epochs, which are essential for subsequent sleep staging and downstream clinical
+screening tasks.
 
 Key functionalities:
 - Loading and mapping sleep stage annotations to numerical labels

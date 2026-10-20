@@ -14,7 +14,7 @@ Key functionalities:
 - Parallel processing of multiple recordings for efficient dataset preparation
 - Integration with project utilities for signal loading, preprocessing, and saving
 
-This preprocessing is critical for preparing the HANG7 dataset for downstream sleep staging and mental disorder diagnosis tasks.
+This preprocessing is critical for preparing the HANG7 dataset for downstream sleep staging and clinical screening tasks.
 """
 
 import numpy as np

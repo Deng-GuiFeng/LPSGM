@@ -14,7 +14,7 @@ Key functionalities:
 - Support parallel processing of multiple subjects.
 
 This preprocessing is critical for preparing the DCSM dataset to be compatible with the LPSGM model's 
-requirements for sleep staging and mental disorder diagnosis.
+requirements for sleep staging and downstream clinical screening.
 """
 
 import numpy as np

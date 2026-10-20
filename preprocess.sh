@@ -26,7 +26,7 @@ python ./preprocess/MASS-SS1-SS3.py
 python ./preprocess/MESA.py
 
 
-# Prepare Sleep Disorder Datasets
+# Prepare Narcolepsy Screening Dataset (MNC)
 
 python ./preprocess/MNC/CNC.py
 python ./preprocess/MNC/FHC.py

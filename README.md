@@ -1,10 +1,10 @@
-# LPSGM: A Unified Flexible Large Polysomnography Model for Sleep Staging and Screening of Sleep Disorders and Depression
+# LPSGM: A Unified Flexible Large Polysomnography Model for Sleep Staging and Downstream Clinical Screening
 
 ## Overview
 
 ![overview](figures/graphical_abstract.png)
 
-**Figure 1**: Overview of the LPSGM framework. Panel (a): Data harmonization schematizes the aggregation of 220,500 hours of PSG data from 16 public datasets and 2 independent clinical cohorts, spanning diverse geographic populations and recording protocols. Panel (b): Cross-center generalization outlines the training-evaluation pipeline: LPSGM is pre-trained on multi-center public datasets, validated for cross-domain sleep staging on two unseen private datasets, and fine-tuned for downstream screening tasks covering narcolepsy, obstructive sleep apnea (OSA), and depression. Panel (c): Analytical validation details the study's three-pronged evaluation: (1) a prospective clinical trial benchmarking LPSGM against expert consensus, (2) interpretability analysis to decode decision-making patterns, and (3) ablation studies quantifying the contribution of key components.
+**Figure 1**: Overview of the LPSGM framework. Panel (a): Data harmonization schematizes the aggregation of PSG data from 16 public datasets (220,500 hours), the public MNC dataset and 2 independent clinical cohorts, spanning diverse geographic populations and recording protocols. Panel (b): Cross-center generalization outlines the training-evaluation pipeline: LPSGM is pre-trained on multi-center public datasets, validated for cross-domain sleep staging on two unseen private datasets, and fine-tuned for downstream screening tasks covering narcolepsy, obstructive sleep apnea (OSA), and depression. Panel (c): Analytical validation details the study's three-pronged evaluation: (1) a prospective clinical trial benchmarking LPSGM against expert consensus, (2) interpretability analysis to decode decision-making patterns, and (3) ablation studies quantifying the contribution of key components.
 
 ## Architecture
 
@@ -66,7 +66,7 @@ To reproduce the complete training process, apply for and download the following
 | Dataset | Link |
 |---------|------|
 | APPLES | [https://sleepdata.org/datasets/apples](https://sleepdata.org/datasets/apples) |
-| DCSM | [https://sleepdata.org/datasets/dcsm](https://sleepdata.org/datasets/dcsm) |
+| DCSM | [https://erda.ku.dk/public/archives/db553715ecbe1f3ac66c1dc569826eef/published-archive.html](https://erda.ku.dk/public/archives/db553715ecbe1f3ac66c1dc569826eef/published-archive.html) |
 | DOD | [https://zenodo.org/records/15900394](https://zenodo.org/records/15900394) |
 | HMC | [https://physionet.org/content/hmc-sleep-staging/1.1/](https://physionet.org/content/hmc-sleep-staging/1.1/) |
 | ISRUC | [https://sleeptight.isr.uc.pt/](https://sleeptight.isr.uc.pt/) |
@@ -84,7 +84,7 @@ To reproduce the complete training process, apply for and download the following
 | MASS (SS1 and SS3) | [https://borealisdata.ca/dataverse/MASS](https://borealisdata.ca/dataverse/MASS) |
 | MESA | [https://sleepdata.org/datasets/mesa](https://sleepdata.org/datasets/mesa) |
 
-### Sleep Disorder Diagnosis Dataset
+### Narcolepsy Screening Dataset
 
 | Dataset | Link |
 |---------|------|
@@ -108,9 +108,9 @@ bash train.sh
 
 **Important**: To reduce memory overhead, the training process doesn't load all samples into memory. Instead, samples are cached in the directory specified by `--cache_root` and loaded dynamically during training. Make sure this directory has enough space to cache the segmented training samples (approximately 1TB as used in our paper).
 
-## Screening for Sleep Disorders and Depression
+## Downstream Clinical Screening
 
-As a downstream application of the pre-trained LPSGM encoder, we provide fine-tuning pipelines for narcolepsy, OSA severity, and depression classification. All three tasks share a unified two-stage protocol: backbone fine-tuning followed by frozen-backbone linear probing with a single class-weighted logistic regression. The shared implementation lives in `cls_core/`; task-specific data adapters and CLIs live in `nar_cls/`, `osa_cls/`, and `dep_cls/`. Per-fold outputs are written under `run_<task>/fold{N}/`.
+As a downstream application of the pre-trained LPSGM encoder, we provide fine-tuning pipelines for narcolepsy, OSA severity, and depression symptom classification. All three tasks share a unified two-stage protocol: backbone fine-tuning followed by frozen-backbone linear probing with a single class-weighted logistic regression. The shared implementation lives in `cls_core/`; task-specific data adapters and CLIs live in `nar_cls/`, `osa_cls/`, and `dep_cls/`. Per-fold outputs are written under `run_<task>/fold{N}/`.
 
 ### Narcolepsy (MNC, 3-class and binary)
 
@@ -131,7 +131,7 @@ python preprocess/APPLES.py
 bash osa_cls/run_osa.sh
 ```
 
-### Depression (APPLES, binary)
+### Depression Symptoms (APPLES, binary)
 
 Classes: Depressed vs Non-depressed. Labels are computed by `preprocess/apples_labels.py` from the same table (460 subjects; derivation criteria combine the self-reported `depressionmedhxhp` field with the HAMD and BDI clinical scale scores `hamdtotalscore` and `bditotalscore`; see the docstring of `preprocess/apples_labels.py` for the exact rules).
 
@@ -158,7 +158,7 @@ Class probabilities are written to a CSV file, one row per recording, with one c
 
 ### Cross-Dataset Evaluation
 
-`nar_cls/transfer.py` (MNC Normal vs Abnormal) and `dep_cls/transfer.py` (APPLES depression) evaluate the screening models on an external cohort: the five fold models of the task are applied as one ensemble, and their class probabilities are averaged. The external cohorts in our paper, HANG7 and SYSU, are private clinical datasets and are not distributed. To evaluate on another cohort, preprocess it into the same NPZ format (see `preprocess/`) and provide a label CSV with the columns described in the docstring of the corresponding script:
+`nar_cls/transfer.py` (MNC Normal vs Abnormal) and `dep_cls/transfer.py` (APPLES depression symptoms) evaluate the screening models on an external cohort: the five fold models of the task are applied as one ensemble, and their class probabilities are averaged. The external cohorts in our paper, HANG7 and SYSU, are private clinical datasets and are not distributed. To evaluate on another cohort, preprocess it into the same NPZ format (see `preprocess/`) and provide a label CSV with the columns described in the docstring of the corresponding script:
 
 ```bash
 python -m nar_cls.transfer --model-root weights/screening/mnc_binary \

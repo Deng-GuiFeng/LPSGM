@@ -16,7 +16,7 @@ Key functionalities:
 - Saving processed data in a structured format for downstream model training
 - Parallel processing with progress tracking for scalability
 
-This preprocessing is critical for preparing the HOMEPAP dataset for sleep staging and mental disorder diagnosis tasks.
+This preprocessing is critical for preparing the HOMEPAP dataset for sleep staging and downstream clinical screening tasks.
 """
 
 import numpy as np

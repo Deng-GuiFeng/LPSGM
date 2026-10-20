@@ -11,7 +11,7 @@ The file also includes functionality to count diagnosis occurrences and filter c
 based on the actual subject directories present in the dataset folders.
 
 This information is essential for dataset management, subject diagnosis labeling, and cohort-specific analyses
-within the Large Polysomnography Model (LPSGM) framework, which focuses on sleep staging and mental disorder diagnosis.
+within the Large Polysomnography Model (LPSGM) framework, which focuses on sleep staging and downstream clinical screening.
 """
 
 import re

@@ -2,7 +2,7 @@
 """
 utils.py
 
-This module provides utility functions for the LPSGM project, which focuses on large-scale polysomnography (PSG) data processing for sleep staging and mental disorder diagnosis. The functionalities include file searching, data validation, signal preprocessing (filtering, resampling, normalization, epoch segmentation), EDF channel extraction, signal loading with flexible channel mapping, and calculation of sleep metrics from hypnograms. These utilities support the core model by preparing and validating PSG data and extracting relevant sleep parameters.
+This module provides utility functions for the LPSGM project, which focuses on large-scale polysomnography (PSG) data processing for sleep staging and downstream clinical screening. The functionalities include file searching, data validation, signal preprocessing (filtering, resampling, normalization, epoch segmentation), EDF channel extraction, signal loading with flexible channel mapping, and calculation of sleep metrics from hypnograms. These utilities support the core model by preparing and validating PSG data and extracting relevant sleep parameters.
 """
 
 import os

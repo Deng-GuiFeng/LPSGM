@@ -4,7 +4,7 @@ train.py
 
 Main training script for the Large Polysomnography Model (LPSGM) project.
 
-This script orchestrates the entire training pipeline for LPSGM, a large-scale model designed for sleep staging and mental disorder diagnosis using polysomnography data. It handles dataset preparation, configuration logging, model training, and evaluation/testing. The script supports flexible channel configurations, domain-adaptive pre-training, and is designed to work with multiple public PSG datasets.
+This script orchestrates the entire training pipeline for LPSGM, a large-scale model designed for sleep staging and downstream clinical screening using polysomnography data. It handles dataset preparation, configuration logging, model training, and evaluation/testing. The script supports flexible channel configurations, domain-adaptive pre-training, and is designed to work with multiple public PSG datasets.
 
 Key functionalities:
 - Parsing and managing command-line arguments for model configuration and training parameters.

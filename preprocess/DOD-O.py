@@ -4,7 +4,7 @@ DOD-O Dataset Preprocessing Module for LPSGM Project
 
 This script handles the preprocessing of the DOD-O polysomnography dataset, which is part of the Large Polysomnography Model (LPSGM) project. 
 It reads raw PSG data stored in HDF5 files, extracts relevant EEG, EOG, and EMG channels, resamples signals, aligns them with hypnogram annotations, 
-removes unknown sleep stage labels, and saves the processed data for downstream sleep staging and mental disorder diagnosis tasks.
+removes unknown sleep stage labels, and saves the processed data for downstream sleep staging and clinical screening tasks.
 
 Key functionalities:
 - Reading multi-channel PSG signals and hypnogram annotations from HDF5 files

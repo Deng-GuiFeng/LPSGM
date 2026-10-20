@@ -4,7 +4,7 @@ Sequence Encoder with Additive CLS Token Aggregation.
 
 This module defines a Transformer-based sequence encoder used in the LPSGM project for modeling temporal dependencies in polysomnography data sequences. 
 It incorporates learnable spatial and temporal embeddings, and utilizes an additive CLS token mechanism to aggregate sequence information.
-The encoder processes input features extracted from epochs across multiple channels and time steps, enhancing representation for downstream tasks such as sleep staging and mental disorder diagnosis.
+The encoder processes input features extracted from epochs across multiple channels and time steps, enhancing representation for downstream tasks such as sleep staging and downstream clinical screening.
 
 Key components:
 - Spatial embedding for channel-specific feature encoding

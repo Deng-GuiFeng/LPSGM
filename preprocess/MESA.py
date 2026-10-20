@@ -14,7 +14,7 @@ Key functionalities:
 - Parallel processing of multiple subject recordings for efficient dataset preparation
 - Integration with utility functions for saving and formatting checks
 
-This preprocessing step is critical for preparing the MESA dataset to be used for sleep staging and mental disorder diagnosis 
+This preprocessing step is critical for preparing the MESA dataset to be used for sleep staging and downstream clinical screening 
 using the LPSGM model.
 """
 

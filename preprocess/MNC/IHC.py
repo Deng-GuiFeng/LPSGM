@@ -16,7 +16,7 @@ Key functionalities:
 - Parallelize processing using multiprocessing Pool with progress tracking
 
 This preprocessing step is critical for preparing the MNC IHC dataset for sleep staging and
-mental disorder diagnosis model training and evaluation.
+downstream clinical screening model training and evaluation.
 """
 
 import numpy as np

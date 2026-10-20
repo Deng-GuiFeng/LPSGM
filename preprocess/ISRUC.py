@@ -16,7 +16,7 @@ to accelerate preprocessing. The script supports flexible channel configurations
 and ensures consistency between signals and annotations.
 
 This module is a critical component in the data pipeline enabling robust sleep staging
-and mental disorder diagnosis using LPSGM.
+and downstream clinical screening using LPSGM.
 """
 
 import numpy as np

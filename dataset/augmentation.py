@@ -5,7 +5,7 @@ augmentation.py
 This module provides data augmentation functions for polysomnography (PSG) signals used in the LPSGM project.
 These augmentations enhance model robustness by introducing variability in channel selection, temporal alignment,
 and sequence segmentation. The functions support multi-channel PSG data and associated labels, enabling flexible
-preprocessing for sleep staging and mental disorder diagnosis tasks.
+preprocessing for sleep staging and downstream clinical screening tasks.
 
 Functions:
 - random_channel_crop: Randomly selects a subset of channels from the input sequence and associated data.

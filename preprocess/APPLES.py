@@ -5,7 +5,7 @@ APPLES Dataset Preprocessing Module
 This module handles the preprocessing of the APPLES polysomnography (PSG) dataset for the LPSGM project.
 It includes functions to load annotation files, process individual PSG recordings by extracting and 
 preprocessing signal epochs based on sleep stage annotations, and save the processed data for downstream 
-sleep staging and mental disorder diagnosis tasks.
+sleep staging and downstream clinical screening tasks.
 
 Key functionalities:
 - Parsing sleep stage annotations and converting them to numerical labels

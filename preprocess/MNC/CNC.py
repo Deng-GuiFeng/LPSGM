@@ -5,7 +5,7 @@ CNC.py
 This script handles the preprocessing of the MNC-CNC cohort dataset for the LPSGM project.
 It loads raw PSG recordings in EDF format, applies signal preprocessing including resampling,
 maps subject IDs to cohort information and diagnoses, and saves the processed data for downstream
-sleep staging and mental disorder diagnosis tasks.
+sleep staging and downstream clinical screening tasks.
 
 Key functionalities:
 - Loading raw PSG signals from EDF files

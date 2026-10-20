@@ -4,7 +4,7 @@ SSC.py
 
 This script preprocesses the MNC-SSC cohort dataset for the LPSGM project. It handles loading raw PSG recordings,
 applying signal preprocessing including resampling, mapping diagnoses, and saving the processed data for downstream
-sleep staging and mental disorder diagnosis tasks. The preprocessing pipeline supports parallel processing to
+sleep staging and downstream clinical screening tasks. The preprocessing pipeline supports parallel processing to
 efficiently handle large-scale data.
 
 Key functionalities:

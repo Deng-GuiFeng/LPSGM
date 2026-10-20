@@ -15,8 +15,8 @@ Key functionalities:
 - Saving processed signals and annotations for downstream model training
 - Parallel processing support for scalability
 
-This file is a critical component in preparing raw HMC PSG data for sleep staging and mental disorder 
-diagnosis using the LPSGM model.
+This file is a critical component in preparing raw HMC PSG data for sleep staging and downstream clinical 
+screening using the LPSGM model.
 """
 
 import numpy as np

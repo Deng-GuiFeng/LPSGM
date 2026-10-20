@@ -13,7 +13,7 @@ Key functionalities include:
 - Loading and preprocessing multi-channel PSG signals from EDF files
 - Synchronizing signal epochs and annotation lengths
 - Removing epochs with unknown or invalid labels
-- Saving cleaned data for downstream sleep staging and mental disorder diagnosis tasks
+- Saving cleaned data for downstream sleep staging and clinical screening tasks
 - Parallel processing with progress tracking
 
 This preprocessing is critical for ensuring data quality and consistency before training 

@@ -2,7 +2,7 @@
 """
 dataloader.py
 
-This module provides a custom data loading pipeline for the LPSGM project, which focuses on large-scale polysomnography (PSG) data processing for sleep staging and mental disorder diagnosis. It includes functions and classes to cache raw PSG data into processed segments, handle data augmentation and splitting, and efficiently load data batches for training, evaluation, and testing.
+This module provides a custom data loading pipeline for the LPSGM project, which focuses on large-scale polysomnography (PSG) data processing for sleep staging and downstream clinical screening. It includes functions and classes to cache raw PSG data into processed segments, handle data augmentation and splitting, and efficiently load data batches for training, evaluation, and testing.
 
 Key functionalities:
 - Cache raw PSG recordings into fixed-length sequences with optional temporal shifts and channel cropping.

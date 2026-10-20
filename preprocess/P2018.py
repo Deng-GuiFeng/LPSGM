@@ -17,7 +17,7 @@ Key functionalities:
 - Support multiprocessing for efficient dataset preprocessing
 
 This preprocessing step is critical for preparing the P2018 dataset to be used in the
-Large Polysomnography Model (LPSGM) for sleep staging and mental disorder diagnosis.
+Large Polysomnography Model (LPSGM) for sleep staging and downstream clinical screening.
 """
 
 import scipy.io as scio

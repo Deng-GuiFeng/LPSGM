@@ -7,7 +7,7 @@ polysomnography (PSG) data sequences. It integrates spatial (channel) embeddings
 temporal embeddings, and a concatenated CLS token to capture both spatial and temporal 
 dependencies across multi-channel PSG epochs. The encoder applies multiple Transformer 
 blocks to model complex temporal relationships, facilitating downstream tasks such as 
-sleep staging and mental disorder diagnosis.
+sleep staging and downstream clinical screening.
 
 Key Features:
 - Learnable spatial embeddings representing PSG channels

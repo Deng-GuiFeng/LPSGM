@@ -10,7 +10,7 @@ Key functionalities:
 - Load and map sleep stage annotations to numerical labels
 - Segment continuous PSG signals into epochs aligned with annotations
 - Preprocess signals including resampling and filtering
-- Save processed data for downstream sleep staging and mental disorder diagnosis tasks
+- Save processed data for downstream sleep staging and clinical screening tasks
 
 The module supports flexible channel configurations and is designed to integrate with the overall LPSGM preprocessing pipeline.
 """

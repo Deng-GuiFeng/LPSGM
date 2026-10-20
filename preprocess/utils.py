@@ -8,7 +8,7 @@ This module provides functions for file handling, data integrity checks, signal 
 and data formatting specific to polysomnography (PSG) datasets. It supports operations such as
 filtering, resampling, label cleaning, and saving processed data segments. These utilities
 facilitate consistent data preparation for the Large Polysomnography Model (LPSGM), which
-performs sleep staging and mental disorder diagnosis using multi-channel PSG recordings.
+performs sleep staging and downstream clinical screening using multi-channel PSG recordings.
 """
 
 import os

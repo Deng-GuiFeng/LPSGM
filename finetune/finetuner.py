@@ -13,7 +13,7 @@ Key components:
 - Finetuner: Main class for fine-tuning LPSGM, including data loading, training loop, evaluation, testing, and checkpointing.
 
 This file plays a critical role in adapting the pre-trained LPSGM model to specific datasets for improved sleep staging 
-and mental disorder diagnosis performance.
+and downstream clinical screening performance.
 """
 
 import torch.nn as nn

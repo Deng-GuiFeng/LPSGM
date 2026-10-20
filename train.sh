@@ -13,20 +13,20 @@ python train.py \
     --seq_emb_dim 64 \
     --num_transformer_blocks 4 \
     --eval_size 0.1 \
-    --batch_size 32 \
+    --batch_size 512 \
     --num_workers 32 \
     --num_processes 100 \
-    --epochs 25 \
-    --warmup_epochs 10 \
+    --epochs 35 \
+    --warmup_epochs 15 \
     --lr0 1e-4 \
-    --weight_decay 1e-4 \
-    --eta_min 1e-8 \
+    --weight_decay 1e-3 \
+    --eta_min 1e-6 \
     --clip_value 1 \
     --clamp_value 10 \
     --target_domain HANG7,SYSU \
     --cache_root .cache \
     --random_shift_len 0 \
-    --source_domains APPLES,DCSM,DOD-H,DOD-O,HMC,ISRUC,P2018,SHHS-1,SHHS-2,STAGES-BOGN,STAGES-STNF,STAGES-MSTR,STAGES-GSDV,STAGES-GSBB,STAGES-GSLH,STAGES-GSSA,STAGES-GSSW,STAGES-MSMI,STAGES-MSNF,STAGES-MSQW,STAGES-MSTH,STAGES-STLK,ABC,NCHSDB,HOMEPAP,SVUH,CHAT,CCSHS,CFS,MROS,MESA,MASS-SS1,MASS-SS3,BOAS,PATS,WSC  \
+    --source_domains APPLES,DCSM,DOD-H,DOD-O,HMC,ISRUC,P2018,SHHS-1,SHHS-2,STAGES-BOGN,STAGES-STNF,STAGES-MSTR,STAGES-GSDV,STAGES-GSBB,STAGES-GSLH,STAGES-GSSA,STAGES-GSSW,STAGES-MSMI,STAGES-MSNF,STAGES-MSQW,STAGES-MSTH,STAGES-STLK,ABC,NCHSDB,HOMEPAP,SVUH,CHAT,CCSHS,CFS,MROS  \
     --save_epoch \
     --save_pred 
     # --save_dir 

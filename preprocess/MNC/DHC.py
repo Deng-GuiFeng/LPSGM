@@ -4,7 +4,7 @@ DHC.py
 
 This script performs preprocessing for the MNC DHC cohort dataset, which is part of the LPSGM project.
 It processes raw PSG recordings by loading signals, applying preprocessing steps including resampling,
-mapping diagnoses, and saving the processed data for downstream sleep staging and mental disorder diagnosis tasks.
+mapping diagnoses, and saving the processed data for downstream sleep staging and clinical screening tasks.
 
 Key functionalities:
 - Load raw PSG signal data from EDF files

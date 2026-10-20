@@ -15,7 +15,7 @@ Key functionalities include:
 - Designed to handle large-scale PSG datasets with multiple subjects and recordings.
 
 This file plays a critical role in validating model performance on unseen test data, facilitating cross-center generalization assessment,
-and enabling comprehensive benchmarking of sleep staging and mental disorder diagnosis capabilities.
+and enabling comprehensive benchmarking of sleep staging and downstream clinical screening capabilities.
 """
 
 import torch

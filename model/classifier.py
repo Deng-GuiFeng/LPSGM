@@ -2,7 +2,7 @@
 """
 classifier.py
 
-This module defines the classification head used in the LPSGM project for sleep staging and mental disorder diagnosis.
+This module defines the classification head used in the LPSGM project for sleep staging and downstream clinical screening.
 It implements a simple linear layer that maps extracted features to class logits, supporting multi-class classification
 tasks such as 5-class sleep stage classification. This component receives feature representations from upstream encoders
 and outputs predictions for downstream diagnostic tasks.

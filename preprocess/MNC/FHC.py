@@ -2,7 +2,7 @@
 """
 FHC.py
 
-This script preprocesses the MNC FHC cohort data for the LPSGM project, which focuses on sleep staging and mental disorder diagnosis using polysomnography (PSG) data. 
+This script preprocesses the MNC FHC cohort data for the LPSGM project, which focuses on sleep staging and downstream clinical screening using polysomnography (PSG) data. 
 It handles loading raw EDF recordings, applying signal preprocessing including resampling, mapping subject IDs to cohort metadata, and saving the processed signals along with diagnosis labels.
 The script supports parallel processing to efficiently handle large datasets and ensures data consistency by filtering and mapping subject identifiers.
 
